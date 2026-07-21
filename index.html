@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkmate - Chess Themed To-Do Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Authentication Overlay -->
+    <div id="auth-overlay" class="auth-overlay">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <span class="logo-icon">♔</span>
+                <h1>Checkmate</h1>
+            </div>
+            <p class="auth-subtitle">Enter the Chess Arena</p>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active">
+                <h2 class="form-title">Player Sign In</h2>
+                <div class="input-group">
+                    <input type="text" id="login-username" placeholder="Username" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
+                </div>
+                <div id="login-error" class="auth-error-msg"></div>
+                <button type="submit" class="auth-btn">Start Match (Log In)</button>
+                <p class="switch-form-text">New contender? <a href="#" id="to-register">Register Account</a></p>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="auth-form">
+                <h2 class="form-title">Create Profile</h2>
+                <div class="input-group">
+                    <input type="text" id="register-username" placeholder="Username (Min 3 chars)" required minlength="3" autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="register-password" placeholder="Password (Min 4 chars)" required minlength="4" autocomplete="new-password">
+                </div>
+                <div id="register-error" class="auth-error-msg"></div>
+                <div id="register-success" class="auth-success-msg"></div>
+                <button type="submit" class="auth-btn">Join League (Register)</button>
+                <p class="switch-form-text">Already a player? <a href="#" id="to-login">Sign In</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- App Container (Initially blurred or hidden until login) -->
+    <div id="app-container" class="app-container authenticated-only">
+        <!-- Sidebar / Player Profile -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <span class="logo-icon">♔</span>
+                <h1>Checkmate</h1>
+            </div>
+            
+            <div class="player-card">
+                <div class="avatar-area">
+                    <span class="player-piece">♕</span>
+                </div>
+                <div class="player-info">
+                    <h2 id="display-username" class="player-name">Grandmaster</h2>
+                    <div class="player-rank">
+                        <span class="rank-title">ELO:</span>
+                        <span id="elo-rating" class="rating-value">1200</span>
+                    </div>
+                </div>
+                <button id="logout-btn" class="logout-btn" title="Resign Match (Log Out)">⟳</button>
+            </div>
+
+            <div class="stats-panel">
+                <h3>Game Statistics</h3>
+                <div class="stat-row">
+                    <span>Tasks Active:</span>
+                    <span id="stat-active" class="stat-val">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Checkmates:</span>
+                    <span id="stat-completed" class="stat-val">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Captures:</span>
+                    <span id="stat-captured" class="stat-val">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Win Rate:</span>
+                    <span id="stat-winrate" class="stat-val">100%</span>
+                </div>
+            </div>
+
+            <div class="graveyard-container">
+                <h3>Captured Pieces (Graveyard)</h3>
+                <div id="graveyard" class="graveyard-grid">
+                    <!-- Captured piece icons go here -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Task Area -->
+        <main class="main-content">
+            <!-- Header/Status banner -->
+            <header class="top-header">
+                <div class="quote-box">
+                    <p id="chess-quote">"Every chess game is a new life." — Sergiu Samarian</p>
+                </div>
+            </header>
+
+            <!-- Command Center / Input Area -->
+            <section class="command-center">
+                <h2>Propose a Move (Add Task)</h2>
+                <form id="todo-form" class="move-form">
+                    <div class="input-group">
+                        <input type="text" id="task-input" placeholder="e.g., Implement the database repository..." required autocomplete="off">
+                    </div>
+                    <div class="selectors-group">
+                        <div class="piece-selector">
+                            <label>Piece (Priority)</label>
+                            <div class="piece-options">
+                                <label class="piece-option">
+                                    <input type="radio" name="priority" value="pawn" checked>
+                                    <span class="piece-btn" title="Pawn (Low Priority)">♙ <span>Pawn</span></span>
+                                </label>
+                                <label class="piece-option">
+                                    <input type="radio" name="priority" value="knight">
+                                    <span class="piece-btn" title="Knight (Medium Priority)">♘ <span>Knight</span></span>
+                                </label>
+                                <label class="piece-option">
+                                    <input type="radio" name="priority" value="rook">
+                                    <span class="piece-btn" title="Rook (High Priority)">♖ <span>Rook</span></span>
+                                </label>
+                                <label class="piece-option">
+                                    <input type="radio" name="priority" value="king">
+                                    <span class="piece-btn" title="King (Critical Focus)">♔ <span>King</span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="play-btn">Play Move (Add)</button>
+                </form>
+            </section>
+
+            <!-- Board & Tasks List -->
+            <section class="board-section">
+                <div class="section-title-row">
+                    <h2>Active Board (Tasks)</h2>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="king">Kings</button>
+                        <button class="filter-btn" data-filter="rook">Rooks</button>
+                        <button class="filter-btn" data-filter="knight">Knights</button>
+                        <button class="filter-btn" data-filter="pawn">Pawns</button>
+                    </div>
+                </div>
+
+                <div id="tasks-board" class="tasks-board">
+                    <!-- Tasks will be rendered dynamically as chess-styled cards -->
+                </div>
+
+                <div id="empty-state" class="empty-state">
+                    <div class="empty-icon">⛉</div>
+                    <h3>The board is clear.</h3>
+                    <p>Propose your next move above to begin the game.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
