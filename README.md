@@ -1,1 +1,1 @@
-This is a to-d- list tracker with a theme of chess hence the name checkmate
+This is a to-do list website tracker with a theme of chess hence the name checkmate
