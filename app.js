@@ -1,25 +1,23 @@
-// Multi-user authentication and task tracking
+// Multi-user authentication and task tracking - Grandmaster Edition
 let currentUser = null;
 
 let state = {
     tasks: [],
     graveyard: [],
     elo: 1200,
-    capturedCount: 0
+    capturedCount: 0,
+    theme: 'obsidian'
 };
 
-// Chess Quotes List
 const quotes = [
     '"Every chess game is a new life." — Sergiu Samarian',
     '"Play the opening like a book, the middlegame like a magician, and the endgame like a machine." — Rudolf Spielmann',
     '"Chess is the struggle against the error." — Johannes Zukertort',
     '"I don\'t believe in psychology. I believe in good moves." — Bobby Fischer',
     '"The most powerful weapon in chess is to have the next move." — David Bronstein',
-    '"Chess is a war over the board. The object is to crush the opponent\'s mind." — Bobby Fischer',
-    '"Strategy requires thought, tactics requires observation." — Max Euwe'
+    '"Chess is a war over the board. The object is to crush the opponent\'s mind." — Bobby Fischer'
 ];
 
-// Piece unicode maps
 const pieceIcons = {
     pawn: '♙',
     knight: '♘',
@@ -34,58 +32,61 @@ const piecePoints = {
     king: 50
 };
 
-// Web Audio API synth moves
+// Map files and ranks
+const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+const ranks = [8, 7, 6, 5, 4, 3, 2, 1];
+
+// Synthesis move sound effects
 function playSound(type) {
     try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
         if (type === 'move') {
             const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(140, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
             osc.start();
             osc.stop(audioCtx.currentTime + 0.1);
         } else if (type === 'checkmate') {
             const now = audioCtx.currentTime;
-            const notes = [261.63, 329.63, 392.00, 523.25];
-            notes.forEach((freq, index) => {
+            const chord = [261.63, 329.63, 392.00, 523.25];
+            chord.forEach((freq, idx) => {
                 const osc = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                osc.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, now + (index * 0.08));
-                gainNode.gain.setValueAtTime(0, now);
-                gainNode.gain.linearRampToValueAtTime(0.15, now + (index * 0.08) + 0.02);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + (index * 0.08) + 0.4);
-                osc.start(now + (index * 0.08));
-                osc.stop(now + (index * 0.08) + 0.4);
+                osc.frequency.setValueAtTime(freq, now + (idx * 0.07));
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.12, now + (idx * 0.07) + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + (idx * 0.07) + 0.45);
+                osc.start(now + (idx * 0.07));
+                osc.stop(now + (idx * 0.07) + 0.45);
             });
         } else if (type === 'capture') {
             const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
             osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.15);
-            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.15);
+            osc.stop(audioCtx.currentTime + 0.12);
         }
     } catch (e) {
-        console.warn("Web Audio not allowed or failed to start: ", e);
+        console.warn("Audio context blocked or disabled", e);
     }
 }
 
-// User registry and Authentication
+// User Profile Registry
 function getUsersRegistry() {
     const registry = localStorage.getItem('checkmate_registry');
     return registry ? JSON.parse(registry) : {};
@@ -95,36 +96,53 @@ function saveUsersRegistry(registry) {
     localStorage.setItem('checkmate_registry', JSON.stringify(registry));
 }
 
-// Load current user profile tasks/state
+// Load / Save States
 function loadUserState() {
     if (!currentUser) return;
     const saved = localStorage.getItem(`checkmate_user_${currentUser}`);
     if (saved) {
         try {
             state = JSON.parse(saved);
+            if (!state.theme) state.theme = 'obsidian';
         } catch (e) {
-            console.error("Failed to parse saved state", e);
+            console.error("Failed to load user state", e);
         }
     } else {
-        // Reset to default for new users
         state = {
             tasks: [],
             graveyard: [],
             elo: 1200,
-            capturedCount: 0
+            capturedCount: 0,
+            theme: 'obsidian'
         };
     }
+    applyTheme(state.theme);
 }
 
-// Save current user state
 function saveUserState() {
     if (!currentUser) return;
     localStorage.setItem(`checkmate_user_${currentUser}`, JSON.stringify(state));
 }
 
-// Display UI stats
+function applyTheme(themeName) {
+    document.documentElement.setAttribute('data-theme', themeName);
+    document.getElementById('theme-select').value = themeName;
+    state.theme = themeName;
+}
+
+// Dynamic ELO Ranking Titles
+function getTitle(elo) {
+    if (elo < 1200) return 'Contender';
+    if (elo < 1500) return 'Club Player';
+    if (elo < 1800) return 'Candidate Master';
+    if (elo < 2000) return 'FIDE Master';
+    if (elo < 2200) return 'International Master';
+    return 'Grandmaster';
+}
+
 function updateStats() {
     document.getElementById('elo-rating').innerText = state.elo;
+    document.getElementById('player-title').innerText = getTitle(state.elo);
     document.getElementById('stat-active').innerText = state.tasks.length;
     
     const completedCount = state.graveyard.length;
@@ -136,59 +154,152 @@ function updateStats() {
     document.getElementById('stat-winrate').innerText = `${winrate}%`;
 }
 
-// Render the graveyard (completed tasks as pieces)
 function renderGraveyard() {
     const container = document.getElementById('graveyard');
     container.innerHTML = '';
-    
     state.graveyard.forEach(item => {
         const span = document.createElement('span');
         span.className = 'captured-piece';
         span.innerHTML = pieceIcons[item.priority] || '♙';
-        span.title = `Completed: "${item.text}" (+${piecePoints[item.priority]} ELO)`;
+        span.title = `Checkmated: "${item.text}" (+${piecePoints[item.priority]} ELO)`;
         container.appendChild(span);
     });
 }
 
-// Render active tasks on the board
-function renderTasks(filter = 'all') {
-    const board = document.getElementById('tasks-board');
-    const emptyState = document.getElementById('empty-state');
+// Visual 8x8 Chessboard builder
+function renderChessboard() {
+    const board = document.getElementById('chess-board');
     board.innerHTML = '';
     
-    const filteredTasks = state.tasks.filter(t => filter === 'all' || t.priority === filter);
+    // Create coordinate mapping for easy lookup
+    const pieceMap = {};
+    state.tasks.forEach(t => {
+        if (t.boardPos) {
+            pieceMap[t.boardPos] = t;
+        }
+    });
     
-    if (filteredTasks.length === 0) {
-        emptyState.style.display = 'flex';
-        board.style.display = 'none';
-        return;
+    // 8 ranks, 8 files
+    for (let r = 0; r < 8; r++) {
+        for (let f = 0; f < 8; f++) {
+            const squareName = files[f] + ranks[r];
+            const square = document.createElement('div');
+            square.className = `board-square ${(r + f) % 2 === 0 ? 'light' : 'dark'}`;
+            square.dataset.coord = squareName;
+            
+            const task = pieceMap[squareName];
+            if (task) {
+                const piece = document.createElement('span');
+                piece.className = 'board-piece';
+                piece.innerHTML = pieceIcons[task.priority];
+                piece.title = `[${task.priority.toUpperCase()}] ${task.text}`;
+                square.appendChild(piece);
+                
+                // Clicking square highlights the task card
+                square.addEventListener('click', () => {
+                    highlightTaskCard(task.id);
+                });
+            }
+            
+            board.appendChild(square);
+        }
+    }
+}
+
+// Find a random free board square depending on progress phase
+// Opening: ranks 1-3. Middlegame: ranks 4-5. Endgame: ranks 6-8.
+function getAvailableSquare(phase) {
+    let allowedRanks = [1, 2, 3];
+    if (phase === 'middlegame') allowedRanks = [4, 5];
+    if (phase === 'endgame') allowedRanks = [6, 7, 8];
+    
+    const activePositions = state.tasks.map(t => t.boardPos);
+    
+    // Try to find a free square
+    let attempts = 0;
+    while (attempts < 100) {
+        const randFile = files[Math.floor(Math.random() * 8)];
+        const randRank = allowedRanks[Math.floor(Math.random() * allowedRanks.length)];
+        const candidate = randFile + randRank;
+        
+        if (!activePositions.includes(candidate)) {
+            return candidate;
+        }
+        attempts++;
     }
     
-    emptyState.style.display = 'none';
-    board.style.display = 'grid';
+    // Fallback: search exhaustively
+    for (let rank of allowedRanks) {
+        for (let file of files) {
+            const pos = file + rank;
+            if (!activePositions.includes(pos)) return pos;
+        }
+    }
+    return 'e2'; // absolute fallback
+}
+
+// Highlight task card
+function highlightTaskCard(id) {
+    // Remove previous highlights
+    document.querySelectorAll('.task-card').forEach(c => c.style.boxShadow = '');
+    document.querySelectorAll('.board-square').forEach(s => s.classList.remove('highlighted'));
     
-    filteredTasks.forEach(task => {
-        const card = document.createElement('div');
-        card.className = `task-card ${task.priority}`;
-        card.id = `task-${task.id}`;
+    const card = document.getElementById(`task-${id}`);
+    if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        card.style.boxShadow = '0 0 15px var(--gold)';
         
-        card.innerHTML = `
-            <div class="task-header">
-                <div class="task-piece-indicator">${pieceIcons[task.priority]}</div>
-                <div class="task-date">${new Date(task.created).toLocaleDateString()}</div>
-            </div>
-            <div class="task-text">${escapeHTML(task.text)}</div>
-            <div class="task-actions">
-                <button class="action-btn checkmate-btn" onclick="checkmateTask(${task.id})">
-                    Checkmate
-                </button>
-                <button class="action-btn capture-btn" onclick="captureTask(${task.id})">
-                    Capture
-                </button>
-            </div>
-        `;
+        const task = state.tasks.find(t => t.id === id);
+        if (task && task.boardPos) {
+            const square = document.querySelector(`[data-coord="${task.boardPos}"]`);
+            if (square) square.classList.add('highlighted');
+        }
+    }
+}
+
+// Render Kanban phases
+function renderTasks() {
+    const phases = ['opening', 'middlegame', 'endgame'];
+    
+    phases.forEach(phase => {
+        const column = document.getElementById(`tasks-${phase}`);
+        const badge = document.getElementById(`badge-${phase}`);
+        column.innerHTML = '';
         
-        board.appendChild(card);
+        const phaseTasks = state.tasks.filter(t => t.phase === phase);
+        badge.innerText = phaseTasks.length;
+        
+        phaseTasks.forEach(task => {
+            const card = document.createElement('div');
+            card.className = `task-card ${task.priority}`;
+            card.id = `task-${task.id}`;
+            
+            card.innerHTML = `
+                <div class="task-header">
+                    <span class="task-piece-indicator">${pieceIcons[task.priority]}</span>
+                    <span class="task-board-pos">${task.boardPos.toUpperCase()}</span>
+                </div>
+                <div class="task-text">${escapeHTML(task.text)}</div>
+                <div class="task-actions">
+                    <div class="phase-nav-btns">
+                        ${phase !== 'opening' ? `<button class="nav-btn" onclick="moveTaskPhase(${task.id}, 'prev')">←</button>` : ''}
+                        ${phase !== 'endgame' ? `<button class="nav-btn" onclick="moveTaskPhase(${task.id}, 'next')">→</button>` : ''}
+                    </div>
+                    <div class="action-row">
+                        <button class="action-btn checkmate-btn" onclick="checkmateTask(${task.id})">Checkmate</button>
+                        <button class="action-btn capture-btn" onclick="captureTask(${task.id})">Capture</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add click listener to highlight corresponding square on board
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('button')) return; // ignore actions
+                highlightTaskCard(task.id);
+            });
+            
+            column.appendChild(card);
+        });
     });
 }
 
@@ -204,7 +315,7 @@ function escapeHTML(str) {
     );
 }
 
-// Add a new task
+// Add Move (Task)
 function handleAddTask(e) {
     e.preventDefault();
     const input = document.getElementById('task-input');
@@ -212,11 +323,14 @@ function handleAddTask(e) {
     if (!text) return;
     
     const priority = document.querySelector('input[name="priority"]:checked').value;
+    const boardPos = getAvailableSquare('opening');
     
     const newTask = {
         id: Date.now(),
         text,
         priority,
+        phase: 'opening',
+        boardPos,
         created: Date.now()
     };
     
@@ -224,64 +338,78 @@ function handleAddTask(e) {
     playSound('move');
     input.value = '';
     
-    // Cycle quote
-    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-    document.getElementById('chess-quote').innerText = randomQuote;
+    // Cycle chess quotes
+    document.getElementById('chess-quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
     
     saveUserState();
     updateStats();
     renderTasks();
+    renderChessboard();
 }
 
-// Complete task (Checkmate)
+// Move task phase (Move piece across the board ranks)
+window.moveTaskPhase = function(id, direction) {
+    const task = state.tasks.find(t => t.id === id);
+    if (!task) return;
+    
+    const phaseOrder = ['opening', 'middlegame', 'endgame'];
+    const currentIdx = phaseOrder.indexOf(task.phase);
+    
+    let newIdx = currentIdx;
+    if (direction === 'next' && currentIdx < 2) newIdx++;
+    if (direction === 'prev' && currentIdx > 0) newIdx--;
+    
+    if (newIdx !== currentIdx) {
+        task.phase = phaseOrder[newIdx];
+        // Relocate piece to a matching rank coordinate
+        task.boardPos = getAvailableSquare(task.phase);
+        
+        playSound('move');
+        saveUserState();
+        renderTasks();
+        renderChessboard();
+        highlightTaskCard(task.id);
+    }
+};
+
+// Checkmate task
 window.checkmateTask = function(id) {
-    const taskIndex = state.tasks.findIndex(t => t.id === id);
-    if (taskIndex === -1) return;
+    const idx = state.tasks.findIndex(t => t.id === id);
+    if (idx === -1) return;
     
-    const task = state.tasks[taskIndex];
-    state.tasks.splice(taskIndex, 1);
-    
+    const task = state.tasks[idx];
+    state.tasks.splice(idx, 1);
     state.graveyard.push(task);
-    state.elo += piecePoints[task.priority] || 10;
+    
+    state.elo += piecePoints[task.priority];
     
     playSound('checkmate');
-    
     saveUserState();
     updateStats();
     renderTasks();
+    renderChessboard();
     renderGraveyard();
 };
 
-// Delete/Cancel task (Capture)
+// Capture task
 window.captureTask = function(id) {
-    const taskIndex = state.tasks.findIndex(t => t.id === id);
-    if (taskIndex === -1) return;
+    const idx = state.tasks.findIndex(t => t.id === id);
+    if (idx === -1) return;
     
-    const task = state.tasks[taskIndex];
-    state.tasks.splice(taskIndex, 1);
-    state.capturedCount += 1;
+    const task = state.tasks[idx];
+    state.tasks.splice(idx, 1);
+    state.capturedCount++;
     
     state.elo = Math.max(100, state.elo - Math.round(piecePoints[task.priority] / 2));
     
     playSound('capture');
-    
     saveUserState();
     updateStats();
     renderTasks();
+    renderChessboard();
 };
 
-// Filter tasks
-function handleFilter(e) {
-    if (!e.target.classList.contains('filter-btn')) return;
-    
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    e.target.classList.add('active');
-    
-    const filter = e.target.getAttribute('data-filter');
-    renderTasks(filter);
-}
-
-// Navigation & Auth Flow
+// Authentication state controller
 function setAuthenticationState(username) {
     currentUser = username;
     if (username) {
@@ -293,6 +421,7 @@ function setAuthenticationState(username) {
         
         updateStats();
         renderTasks();
+        renderChessboard();
         renderGraveyard();
     } else {
         localStorage.removeItem('checkmate_current_user');
@@ -301,7 +430,27 @@ function setAuthenticationState(username) {
     }
 }
 
-// Register Submission
+// Forms Logic
+function handleLogin(e) {
+    e.preventDefault();
+    const errorMsg = document.getElementById('login-error');
+    errorMsg.innerText = '';
+    
+    const u = document.getElementById('login-username').value.trim();
+    const p = document.getElementById('login-password').value;
+    
+    const registry = getUsersRegistry();
+    const record = registry[u.toLowerCase()];
+    
+    if (!record || record.password !== p) {
+        errorMsg.innerText = 'Invalid username or credentials.';
+        return;
+    }
+    
+    playSound('move');
+    setAuthenticationState(record.username);
+}
+
 function handleRegister(e) {
     e.preventDefault();
     const errorMsg = document.getElementById('register-error');
@@ -309,84 +458,60 @@ function handleRegister(e) {
     errorMsg.innerText = '';
     successMsg.innerText = '';
     
-    const username = document.getElementById('register-username').value.trim();
-    const password = document.getElementById('register-password').value;
+    const u = document.getElementById('register-username').value.trim();
+    const p = document.getElementById('register-password').value;
     
-    if (username.length < 3) {
+    if (u.length < 3) {
         errorMsg.innerText = 'Username must be at least 3 characters.';
         return;
     }
-    if (password.length < 4) {
+    if (p.length < 4) {
         errorMsg.innerText = 'Password must be at least 4 characters.';
         return;
     }
     
     const registry = getUsersRegistry();
-    if (registry[username.toLowerCase()]) {
-        errorMsg.innerText = 'Contender username already exists.';
+    if (registry[u.toLowerCase()]) {
+        errorMsg.innerText = 'Username already registered.';
         return;
     }
     
-    // Register player
-    registry[username.toLowerCase()] = {
-        username: username,
-        password: password // In mock local storage, storing plain text is fine
-    };
+    registry[u.toLowerCase()] = { username: u, password: p };
     saveUsersRegistry(registry);
     
-    successMsg.innerText = 'League profile created! Redirecting to Sign In...';
+    successMsg.innerText = 'Contender profile created! Redirecting to Sign In...';
     setTimeout(() => {
         document.getElementById('register-form').classList.remove('active');
         document.getElementById('login-form').classList.add('active');
-        document.getElementById('login-username').value = username;
+        document.getElementById('login-username').value = u;
         document.getElementById('login-password').value = '';
         successMsg.innerText = '';
-        errorMsg.innerText = '';
     }, 1200);
 }
 
-// Login Submission
-function handleLogin(e) {
-    e.preventDefault();
-    const errorMsg = document.getElementById('login-error');
-    errorMsg.innerText = '';
-    
-    const username = document.getElementById('login-username').value.trim();
-    const password = document.getElementById('login-password').value;
-    
-    const registry = getUsersRegistry();
-    const userRecord = registry[username.toLowerCase()];
-    
-    if (!userRecord || userRecord.password !== password) {
-        errorMsg.innerText = 'Invalid username or credentials.';
-        return;
-    }
-    
-    playSound('move');
-    setAuthenticationState(userRecord.username);
-}
-
-// Logout / Resign
 function handleLogout() {
     playSound('capture');
     setAuthenticationState(null);
-    // Reset fields
     document.getElementById('login-username').value = '';
     document.getElementById('login-password').value = '';
     document.getElementById('register-username').value = '';
     document.getElementById('register-password').value = '';
 }
 
-// Init Setup
+// Initial Setup
 document.addEventListener('DOMContentLoaded', () => {
-    // Add event listeners
     document.getElementById('todo-form').addEventListener('submit', handleAddTask);
-    document.querySelector('.filter-buttons').addEventListener('click', handleFilter);
     document.getElementById('login-form').addEventListener('submit', handleLogin);
     document.getElementById('register-form').addEventListener('submit', handleRegister);
     document.getElementById('logout-btn').addEventListener('click', handleLogout);
     
-    // Form toggle links
+    // Theme selection listener
+    document.getElementById('theme-select').addEventListener('change', (e) => {
+        applyTheme(e.target.value);
+        saveUserState();
+    });
+    
+    // Switch auth forms
     document.getElementById('to-register').addEventListener('click', (e) => {
         e.preventDefault();
         document.getElementById('login-form').classList.remove('active');
@@ -399,7 +524,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('login-form').classList.add('active');
     });
     
-    // Check auto login
     const autoUser = localStorage.getItem('checkmate_current_user');
     if (autoUser) {
         setAuthenticationState(autoUser);

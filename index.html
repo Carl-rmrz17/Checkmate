@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="obsidian">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkmate - Chess Themed To-Do Tracker</title>
+    <title>Checkmate - Grandmaster Edition To-Do Tracker</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,11 +17,11 @@
                 <span class="logo-icon">♔</span>
                 <h1>Checkmate</h1>
             </div>
-            <p class="auth-subtitle">Enter the Chess Arena</p>
+            <p class="auth-subtitle">Grandmaster Edition Arena</p>
             
             <!-- Login Form -->
             <form id="login-form" class="auth-form active">
-                <h2 class="form-title">Player Sign In</h2>
+                <h2 class="form-title">Contender Sign In</h2>
                 <div class="input-group">
                     <input type="text" id="login-username" placeholder="Username" required autocomplete="username">
                 </div>
@@ -29,13 +29,13 @@
                     <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
                 </div>
                 <div id="login-error" class="auth-error-msg"></div>
-                <button type="submit" class="auth-btn">Start Match (Log In)</button>
-                <p class="switch-form-text">New contender? <a href="#" id="to-register">Register Account</a></p>
+                <button type="submit" class="auth-btn">Begin Match (Log In)</button>
+                <p class="switch-form-text">Join the ranks? <a href="#" id="to-register">Register Account</a></p>
             </form>
 
             <!-- Register Form -->
             <form id="register-form" class="auth-form">
-                <h2 class="form-title">Create Profile</h2>
+                <h2 class="form-title">Register Player Profile</h2>
                 <div class="input-group">
                     <input type="text" id="register-username" placeholder="Username (Min 3 chars)" required minlength="3" autocomplete="username">
                 </div>
@@ -44,13 +44,13 @@
                 </div>
                 <div id="register-error" class="auth-error-msg"></div>
                 <div id="register-success" class="auth-success-msg"></div>
-                <button type="submit" class="auth-btn">Join League (Register)</button>
-                <p class="switch-form-text">Already a player? <a href="#" id="to-login">Sign In</a></p>
+                <button type="submit" class="auth-btn">Enlist (Register)</button>
+                <p class="switch-form-text">Registered? <a href="#" id="to-login">Sign In</a></p>
             </form>
         </div>
     </div>
 
-    <!-- App Container (Initially blurred or hidden until login) -->
+    <!-- App Container -->
     <div id="app-container" class="app-container authenticated-only">
         <!-- Sidebar / Player Profile -->
         <aside class="sidebar">
@@ -66,17 +66,28 @@
                 <div class="player-info">
                     <h2 id="display-username" class="player-name">Grandmaster</h2>
                     <div class="player-rank">
-                        <span class="rank-title">ELO:</span>
+                        <span id="player-title" class="title-value">Contender</span>
+                        <span class="separator">•</span>
                         <span id="elo-rating" class="rating-value">1200</span>
                     </div>
                 </div>
                 <button id="logout-btn" class="logout-btn" title="Resign Match (Log Out)">⟳</button>
             </div>
 
+            <!-- Theme Switcher -->
+            <div class="theme-panel">
+                <label for="theme-select">Chess Board Theme</label>
+                <select id="theme-select" class="theme-select">
+                    <option value="obsidian">Obsidian Gold</option>
+                    <option value="woodland">Woodland Classic</option>
+                    <option value="emerald">Royal Emerald</option>
+                </select>
+            </div>
+
             <div class="stats-panel">
-                <h3>Game Statistics</h3>
+                <h3>Match Stats</h3>
                 <div class="stat-row">
-                    <span>Tasks Active:</span>
+                    <span>Active Pieces:</span>
                     <span id="stat-active" class="stat-val">0</span>
                 </div>
                 <div class="stat-row">
@@ -84,7 +95,7 @@
                     <span id="stat-completed" class="stat-val">0</span>
                 </div>
                 <div class="stat-row">
-                    <span>Captures:</span>
+                    <span>Captured:</span>
                     <span id="stat-captured" class="stat-val">0</span>
                 </div>
                 <div class="stat-row">
@@ -94,16 +105,13 @@
             </div>
 
             <div class="graveyard-container">
-                <h3>Captured Pieces (Graveyard)</h3>
-                <div id="graveyard" class="graveyard-grid">
-                    <!-- Captured piece icons go here -->
-                </div>
+                <h3>Captured Graveyard</h3>
+                <div id="graveyard" class="graveyard-grid"></div>
             </div>
         </aside>
 
         <!-- Main Task Area -->
         <main class="main-content">
-            <!-- Header/Status banner -->
             <header class="top-header">
                 <div class="quote-box">
                     <p id="chess-quote">"Every chess game is a new life." — Sergiu Samarian</p>
@@ -112,61 +120,79 @@
 
             <!-- Command Center / Input Area -->
             <section class="command-center">
-                <h2>Propose a Move (Add Task)</h2>
+                <h2>Propose a Move</h2>
                 <form id="todo-form" class="move-form">
-                    <div class="input-group">
-                        <input type="text" id="task-input" placeholder="e.g., Implement the database repository..." required autocomplete="off">
+                    <div class="input-row">
+                        <input type="text" id="task-input" placeholder="e.g., Design frontend framework layer..." required autocomplete="off">
+                        <button type="submit" class="play-btn">Play Move (Add)</button>
                     </div>
-                    <div class="selectors-group">
-                        <div class="piece-selector">
-                            <label>Piece (Priority)</label>
-                            <div class="piece-options">
-                                <label class="piece-option">
-                                    <input type="radio" name="priority" value="pawn" checked>
-                                    <span class="piece-btn" title="Pawn (Low Priority)">♙ <span>Pawn</span></span>
-                                </label>
-                                <label class="piece-option">
-                                    <input type="radio" name="priority" value="knight">
-                                    <span class="piece-btn" title="Knight (Medium Priority)">♘ <span>Knight</span></span>
-                                </label>
-                                <label class="piece-option">
-                                    <input type="radio" name="priority" value="rook">
-                                    <span class="piece-btn" title="Rook (High Priority)">♖ <span>Rook</span></span>
-                                </label>
-                                <label class="piece-option">
-                                    <input type="radio" name="priority" value="king">
-                                    <span class="piece-btn" title="King (Critical Focus)">♔ <span>King</span></span>
-                                </label>
-                            </div>
+                    <div class="piece-selector">
+                        <label>Piece Assignment (Priority)</label>
+                        <div class="piece-options">
+                            <label class="piece-option">
+                                <input type="radio" name="priority" value="pawn" checked>
+                                <span class="piece-btn">♙ <span>Pawn</span></span>
+                            </label>
+                            <label class="piece-option">
+                                <input type="radio" name="priority" value="knight">
+                                <span class="piece-btn">♘ <span>Knight</span></span>
+                            </label>
+                            <label class="piece-option">
+                                <input type="radio" name="priority" value="rook">
+                                <span class="piece-btn">♖ <span>Rook</span></span>
+                            </label>
+                            <label class="piece-option">
+                                <input type="radio" name="priority" value="king">
+                                <span class="piece-btn">♔ <span>King</span></span>
+                            </label>
                         </div>
                     </div>
-                    <button type="submit" class="play-btn">Play Move (Add)</button>
                 </form>
             </section>
 
-            <!-- Board & Tasks List -->
-            <section class="board-section">
-                <div class="section-title-row">
-                    <h2>Active Board (Tasks)</h2>
-                    <div class="filter-buttons">
-                        <button class="filter-btn active" data-filter="all">All</button>
-                        <button class="filter-btn" data-filter="king">Kings</button>
-                        <button class="filter-btn" data-filter="rook">Rooks</button>
-                        <button class="filter-btn" data-filter="knight">Knights</button>
-                        <button class="filter-btn" data-filter="pawn">Pawns</button>
+            <!-- Play Area Layout: Board + Kanban Board -->
+            <div class="play-area">
+                <!-- Visual Chessboard -->
+                <div class="chessboard-panel">
+                    <h3>Tactical Visualizer (Active Board)</h3>
+                    <div id="chess-board" class="chess-board">
+                        <!-- 8x8 squares rendered dynamically -->
+                    </div>
+                    <div class="board-legend">Pieces on the board represent your active tasks. Click any piece to see its description.</div>
+                </div>
+
+                <!-- Chess-Kanban Board -->
+                <div class="kanban-panel">
+                    <div class="kanban-columns">
+                        <!-- Column 1 -->
+                        <div class="kanban-column" data-phase="opening">
+                            <div class="column-header">
+                                <h3>Opening Theory</h3>
+                                <span class="badge" id="badge-opening">0</span>
+                            </div>
+                            <div class="column-tasks" id="tasks-opening"></div>
+                        </div>
+
+                        <!-- Column 2 -->
+                        <div class="kanban-column" data-phase="middlegame">
+                            <div class="column-header">
+                                <h3>Middlegame Tactics</h3>
+                                <span class="badge" id="badge-middlegame">0</span>
+                            </div>
+                            <div class="column-tasks" id="tasks-middlegame"></div>
+                        </div>
+
+                        <!-- Column 3 -->
+                        <div class="kanban-column" data-phase="endgame">
+                            <div class="column-header">
+                                <h3>Endgame Drills</h3>
+                                <span class="badge" id="badge-endgame">0</span>
+                            </div>
+                            <div class="column-tasks" id="tasks-endgame"></div>
+                        </div>
                     </div>
                 </div>
-
-                <div id="tasks-board" class="tasks-board">
-                    <!-- Tasks will be rendered dynamically as chess-styled cards -->
-                </div>
-
-                <div id="empty-state" class="empty-state">
-                    <div class="empty-icon">⛉</div>
-                    <h3>The board is clear.</h3>
-                    <p>Propose your next move above to begin the game.</p>
-                </div>
-            </section>
+            </div>
         </main>
     </div>
     
