@@ -1,0 +1,111 @@
+/* Auth Page overlay elements */
+.auth-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(5, 5, 8, 0.9);
+    backdrop-filter: blur(24px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.auth-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.auth-card {
+    background: rgba(18, 18, 22, 0.85);
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.auth-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.auth-logo h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+}
+
+.auth-subtitle {
+    font-size: 0.8rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+}
+
+.auth-form {
+    display: none;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.auth-form.active {
+    display: flex;
+}
+
+.form-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.input-group input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--gold);
+}
+
+.auth-btn {
+    background: linear-gradient(135deg, var(--gold), var(--board-accent));
+    color: #111;
+    border: none;
+    border-radius: 8px;
+    padding: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.switch-form-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.switch-form-text a {
+    color: var(--gold);
+    text-decoration: none;
+}
+
+.auth-error-msg { color: var(--color-rook); font-size: 0.8rem; text-align: center; }
+.auth-success-msg { color: var(--color-knight); font-size: 0.8rem; text-align: center; }

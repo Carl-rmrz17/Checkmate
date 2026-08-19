@@ -6,8 +6,11 @@
     <title>Checkmate - Grandmaster Edition To-Do Tracker</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/board.css">
+    <link rel="stylesheet" href="css/kanban.css">
 </head>
 <body>
     <!-- Authentication Overlay -->
@@ -42,6 +45,9 @@
                 <div class="input-group">
                     <input type="password" id="register-password" placeholder="Password (Min 4 chars)" required minlength="4" autocomplete="new-password">
                 </div>
+                <div class="input-group">
+                    <input type="url" id="register-avatar" placeholder="Avatar Image URL (Optional)" autocomplete="off">
+                </div>
                 <div id="register-error" class="auth-error-msg"></div>
                 <div id="register-success" class="auth-success-msg"></div>
                 <button type="submit" class="auth-btn">Enlist (Register)</button>
@@ -60,8 +66,8 @@
             </div>
             
             <div class="player-card">
-                <div class="avatar-area">
-                    <span class="player-piece">♕</span>
+                <div class="avatar-area" id="profile-avatar-container">
+                    <span class="player-piece">♔</span>
                 </div>
                 <div class="player-info">
                     <h2 id="display-username" class="player-name">Grandmaster</h2>
@@ -71,8 +77,10 @@
                         <span id="elo-rating" class="rating-value">1200</span>
                     </div>
                 </div>
-                <button id="logout-btn" class="logout-btn" title="Resign Match (Log Out)">⟳</button>
+                <button id="logout-btn" class="logout-btn" title="Resign Match (Log Out)">⏻</button>
             </div>
+
+            <button id="leaderboard-btn" class="sidebar-action-btn">🏆 Global Leaderboard</button>
 
             <!-- Theme Switcher -->
             <div class="theme-panel">
@@ -122,10 +130,16 @@
             <section class="command-center">
                 <h2>Propose a Move</h2>
                 <form id="todo-form" class="move-form">
-                    <div class="input-row">
+                    <div class="input-row main-input">
                         <input type="text" id="task-input" placeholder="e.g., Design frontend framework layer..." required autocomplete="off">
                         <button type="submit" class="play-btn">Play Move (Add)</button>
                     </div>
+                    
+                    <div class="input-row secondary-inputs">
+                        <input type="datetime-local" id="task-due-date" title="Due Date">
+                        <input type="text" id="task-notes" placeholder="Additional notes..." autocomplete="off">
+                    </div>
+
                     <div class="piece-selector">
                         <label>Piece Assignment (Priority)</label>
                         <div class="piece-options">
@@ -196,6 +210,21 @@
         </main>
     </div>
     
-    <script src="app.js"></script>
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>🏆 Global Leaderboard</h2>
+                <button class="close-modal-btn" id="close-leaderboard">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="leaderboard-list" id="leaderboard-list">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

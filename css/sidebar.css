@@ -1,0 +1,208 @@
+/* Sidebar styling */
+.sidebar {
+    width: 320px;
+    background: rgba(15, 15, 18, 0.9);
+    border-right: 1px solid var(--panel-border);
+    backdrop-filter: blur(16px);
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.logo-icon {
+    font-size: 2.2rem;
+    color: var(--gold);
+    text-shadow: 0 0 10px var(--gold-glow);
+}
+
+.logo-area h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+}
+
+.player-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.avatar-area {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--tile-light), var(--tile-dark));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.player-piece {
+    font-size: 1.6rem;
+    color: #111;
+}
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.player-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.player-rank {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.title-value {
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.rating-value {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.logout-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    color: var(--color-rook);
+    transform: rotate(-90deg);
+}
+
+/* Theme Selector Panel */
+.theme-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.theme-panel label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+}
+
+.theme-select {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--panel-border);
+    color: var(--text-primary);
+    padding: 0.6rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+}
+
+.stats-panel {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.stats-panel h3, .graveyard-container h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px dashed rgba(255,255,255,0.05);
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.stat-val {
+    font-weight: 600;
+}
+
+.graveyard-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.graveyard-grid {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    flex-grow: 1;
+    padding: 0.75rem;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.4rem;
+    overflow-y: auto;
+    max-height: 180px;
+}
+
+.captured-piece {
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.3);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+}
+
+.sidebar-action-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--panel-border);
+    color: var(--text-primary);
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    text-align: left;
+    display: flex; gap: 0.5rem; align-items: center;
+}
+.sidebar-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--gold);
+}
+

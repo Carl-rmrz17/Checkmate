@@ -1,0 +1,171 @@
+/* Variable Definitions and Theme Color Schemes */
+:root {
+    --bg-dark: #09090b;
+    --panel-bg: rgba(20, 20, 25, 0.7);
+    --panel-border: rgba(255, 255, 255, 0.08);
+    --text-primary: #f4f4f5;
+    --text-secondary: #a1a1aa;
+    
+    /* Chess Priorities Colors */
+    --color-king: #fbbf24;
+    --color-rook: #f87171;
+    --color-knight: #34d399;
+    --color-pawn: #94a3b8;
+}
+
+/* Theme Options */
+[data-theme="obsidian"] {
+    --gold: #d4af37;
+    --gold-glow: rgba(212, 175, 55, 0.3);
+    --tile-light: #4b5563;
+    --tile-dark: #1f2937;
+    --board-accent: #d4af37;
+}
+
+[data-theme="woodland"] {
+    --gold: #b58863;
+    --gold-glow: rgba(181, 136, 99, 0.3);
+    --tile-light: #f0d9b5;
+    --tile-dark: #b58863;
+    --board-accent: #8b5a2b;
+}
+
+[data-theme="emerald"] {
+    --gold: #10b981;
+    --gold-glow: rgba(16, 185, 129, 0.3);
+    --tile-light: #ececd7;
+    --tile-dark: #70a288;
+    --board-accent: #3b7a57;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--bg-dark);
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(20, 15, 30, 0.5) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(10, 25, 20, 0.4) 0px, transparent 50%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.app-container.authenticated-only {
+    display: none;
+}
+
+/* Main Area */
+.main-content {
+    flex-grow: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 1300px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.quote-box {
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.04), transparent);
+    border-left: 3px solid var(--gold);
+    padding: 0.5rem 1.25rem;
+    border-radius: 0 6px 6px 0;
+}
+
+#chess-quote {
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1100px) {
+    .play-area {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 900px) {
+    .app-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+    }
+}
+
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center; justify-content: center;
+    z-index: 2000;
+}
+.modal-overlay.hidden {
+    display: none;
+}
+.modal-card {
+    background: rgba(20, 20, 25, 0.95);
+    border: 1px solid var(--gold);
+    border-radius: 12px;
+    width: 90%; max-width: 500px;
+    max-height: 80vh;
+    display: flex; flex-direction: column;
+}
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.25rem; border-bottom: 1px solid var(--panel-border);
+}
+.modal-header h2 { font-family: "Cinzel", serif; color: var(--gold); font-size: 1.2rem; }
+.close-modal-btn {
+    background: none; border: none; color: var(--text-secondary);
+    font-size: 1.5rem; cursor: pointer;
+}
+.close-modal-btn:hover { color: var(--text-primary); }
+.modal-content {
+    padding: 1.25rem; overflow-y: auto;
+}
+
+/* Leaderboard */
+.leaderboard-list {
+    display: flex; flex-direction: column; gap: 0.75rem;
+}
+.leaderboard-item {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.03);
+    padding: 0.75rem; border-radius: 8px; border: 1px solid var(--panel-border);
+}
+.leaderboard-item .rank {
+    font-size: 1.2rem; font-weight: 700; color: var(--gold); width: 30px;
+}
+.leaderboard-item .user-info {
+    display: flex; align-items: center; gap: 0.75rem; flex-grow: 1;
+}
+.leaderboard-item .avatar {
+    width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
+    background: var(--tile-dark);
+}
+.leaderboard-item .stats {
+    text-align: right; font-size: 0.85rem; color: var(--text-secondary);
+}
+.leaderboard-item .elo { font-weight: bold; color: var(--text-primary); font-size: 1rem; }
+
+/* Avatars */
+.profile-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
