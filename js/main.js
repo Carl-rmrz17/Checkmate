@@ -133,10 +133,10 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     const errorMsg = document.getElementById('login-error');
     errorMsg.innerText = 'Loading...';
     
-    const u = document.getElementById('login-username').value.trim();
+    const email = document.getElementById('login-email').value.trim();
     const p = document.getElementById('login-password').value;
     
-    const { error } = await signInUser(u, p);
+    const { error } = await signInUser(email, p);
     if (error) {
         errorMsg.innerText = error.message;
     } else {
@@ -152,23 +152,30 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
     errorMsg.innerText = 'Creating profile...';
     successMsg.innerText = '';
     
+    const email = document.getElementById('register-email').value.trim();
     const u = document.getElementById('register-username').value.trim();
     const p = document.getElementById('register-password').value;
+    const confirmP = document.getElementById('register-confirm-password').value;
     const a = document.getElementById('register-avatar').value.trim();
     
-    const { error } = await signUpUser(u, p, a || null);
+    if (p !== confirmP) {
+        errorMsg.innerText = "Passwords do not match!";
+        return;
+    }
+    
+    const { error } = await signUpUser(email, u, p, a || null);
     if (error) {
         errorMsg.innerText = error.message;
     } else {
         errorMsg.innerText = '';
-        successMsg.innerText = 'Profile created! You can now Sign In.';
+        successMsg.innerText = 'Profile created! Please check your email to verify your account (if enabled), or Sign In.';
         setTimeout(() => {
             document.getElementById('register-form').classList.remove('active');
             document.getElementById('login-form').classList.add('active');
-            document.getElementById('login-username').value = u;
+            document.getElementById('login-email').value = email;
             document.getElementById('login-password').value = '';
             successMsg.innerText = '';
-        }, 1500);
+        }, 3000);
     }
 });
 
@@ -342,4 +349,29 @@ if (closeLeaderboard) {
         leaderboardModal.classList.add("hidden");
     });
 }
+
+
+// ---------------------------------------------------------
+// Auth UI Enhancements (Google & Password Toggle)
+// ---------------------------------------------------------
+import { signInWithGoogle } from "./api.js";
+
+const googleBtn = document.getElementById("google-login-btn");
+if (googleBtn) {
+    googleBtn.addEventListener("click", async () => {
+        await signInWithGoogle();
+    });
+}
+
+document.querySelectorAll(".password-toggle-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+        const targetId = btn.getAttribute("data-target");
+        const input = document.getElementById(targetId);
+        if (input.type === "password") {
+            input.type = "text";
+        } else {
+            input.type = "password";
+        }
+    });
+});
 

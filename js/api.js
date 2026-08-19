@@ -8,14 +8,20 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // Authentication
 // ==========================================
 
-export async function signUpUser(username, password, avatar_url = null) {
-    const email = `${username}@checkmate.app`;
+export async function signUpUser(email, username, password, avatar_url = null) {
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
             data: { username, avatar_url }
         }
+    });
+    return { data, error };
+}
+
+export async function signInWithGoogle() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
     });
     return { data, error };
 }
@@ -29,8 +35,7 @@ export async function fetchLeaderboard() {
     return data || [];
 }
 
-export async function signInUser(username, password) {
-    const email = `${username}@checkmate.app`;
+export async function signInUser(email, password) {
     const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password

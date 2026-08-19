@@ -110,3 +110,63 @@
 
 .auth-error-msg { color: var(--color-rook); font-size: 0.8rem; text-align: center; }
 .auth-success-msg { color: var(--color-knight); font-size: 0.8rem; text-align: center; }
+
+.oauth-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 0.8rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.oauth-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+.divider {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+}
+.divider::before, .divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid var(--panel-border);
+}
+.divider span {
+    padding: 0 0.75rem;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.input-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.4rem;
+}
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.password-toggle-btn {
+    position: absolute;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+.password-toggle-btn:hover {
+    opacity: 1;
+}
+
