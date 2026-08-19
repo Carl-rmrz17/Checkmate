@@ -179,12 +179,18 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
     }
 });
 
-document.getElementById('logout-btn').addEventListener('click', async () => {
-    const confirmLogout = confirm("Are you sure you want to resign from this match and log out?");
-    if (confirmLogout) {
-        playSound('capture');
-        await signOutUser();
-    }
+document.getElementById('logout-btn').addEventListener('click', () => {
+    document.getElementById('logout-modal').classList.remove('hidden');
+});
+
+document.getElementById('cancel-logout-btn').addEventListener('click', () => {
+    document.getElementById('logout-modal').classList.add('hidden');
+});
+
+document.getElementById('confirm-logout-btn').addEventListener('click', async () => {
+    document.getElementById('logout-modal').classList.add('hidden');
+    playSound('capture');
+    await signOutUser();
 });
 
 // Toggle forms

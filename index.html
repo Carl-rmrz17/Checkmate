@@ -258,6 +258,22 @@
         </div>
     </div>
     
+    <!-- Logout Modal -->
+    <div id="logout-modal" class="modal-overlay hidden">
+        <div class="modal-card" style="max-width: 400px; text-align: center;">
+            <div class="modal-header" style="justify-content: center; border-bottom: none;">
+                <h2 style="color: var(--color-rook);">Resign Match?</h2>
+            </div>
+            <div class="modal-content" style="padding-top: 0;">
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Are you sure you want to log out and leave the arena?</p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button id="cancel-logout-btn" class="nav-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem;">Cancel</button>
+                    <button id="confirm-logout-btn" class="action-btn capture-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem;">Yes, Log Out</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

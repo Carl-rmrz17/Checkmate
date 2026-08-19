@@ -2,111 +2,131 @@
 .command-center {
     background: var(--panel-bg);
     border: 1px solid var(--panel-border);
-    border-radius: 14px;
-    padding: 1.25rem 1.5rem;
-    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
     backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 .command-center h2 {
     font-family: 'Cinzel', serif;
-    font-size: 1.2rem;
-    margin-bottom: 0.75rem;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
     color: var(--gold);
+    letter-spacing: 1px;
 }
 
 .move-form {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .input-row {
     display: flex;
-    gap: 0.75rem;
+    gap: 1rem;
 }
 
-.input-row input {
+.main-input input {
     flex-grow: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    color: var(--text-primary);
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+}
+
+.main-input input:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.secondary-inputs {
+    margin-top: -0.5rem;
+}
+
+.secondary-inputs input {
+    flex: 1;
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid var(--panel-border);
     border-radius: 8px;
-    padding: 0.8rem 1rem;
+    padding: 0.75rem 1rem;
     color: var(--text-primary);
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
 }
 
-.input-row input:focus {
-    outline: none;
-    border-color: var(--gold);
-}
+.secondary-inputs input:focus { outline: none; border-color: var(--gold); }
 
 .play-btn {
-    background: linear-gradient(135deg, var(--gold), var(--board-accent));
+    background: linear-gradient(135deg, var(--gold), #b8912d);
     color: #111;
     border: none;
-    border-radius: 8px;
-    padding: 0.8rem 1.5rem;
-    font-weight: 700;
+    border-radius: 10px;
+    padding: 1rem 2rem;
+    font-weight: 800;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
 }
 
 .play-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px var(--gold-glow);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--gold-glow);
 }
 
 .piece-selector label {
     font-size: 0.75rem;
     text-transform: uppercase;
     color: var(--text-secondary);
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.5rem;
     display: block;
+    font-weight: 700;
+    letter-spacing: 1px;
 }
 
 .piece-options {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.5rem;
+    display: flex;
+    gap: 1rem;
 }
 
-.piece-option input {
-    display: none;
-}
+.piece-option { flex: 1; }
+.piece-option input { display: none; }
 
 .piece-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
-    background: rgba(255, 255, 255, 0.01);
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--panel-border);
-    border-radius: 8px;
-    padding: 0.5rem;
+    border-radius: 10px;
+    padding: 0.75rem;
     cursor: pointer;
-    font-size: 1.2rem;
-    transition: all 0.3s ease;
+    font-size: 1.4rem;
+    transition: all 0.2s ease;
 }
 
 .piece-btn span {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
+    font-weight: 600;
 }
 
 .piece-option input:checked + .piece-btn {
-    background: rgba(255,255,255,0.03);
-    border-color: var(--gold);
+    background: rgba(255,255,255,0.05);
+    border-width: 2px;
 }
 
-.piece-option:nth-child(1) input:checked + .piece-btn { border-color: var(--color-pawn); }
-.piece-option:nth-child(2) input:checked + .piece-btn { border-color: var(--color-knight); }
-.piece-option:nth-child(3) input:checked + .piece-btn { border-color: var(--color-rook); }
-.piece-option:nth-child(4) input:checked + .piece-btn { border-color: var(--color-king); }
+.piece-option:nth-child(1) input:checked + .piece-btn { border-color: var(--color-pawn); color: var(--color-pawn); }
+.piece-option:nth-child(2) input:checked + .piece-btn { border-color: var(--color-knight); color: var(--color-knight); }
+.piece-option:nth-child(3) input:checked + .piece-btn { border-color: var(--color-rook); color: var(--color-rook); }
+.piece-option:nth-child(4) input:checked + .piece-btn { border-color: var(--color-king); color: var(--color-king); }
 
 /* Chess-Kanban Board */
 .kanban-panel {
@@ -117,41 +137,43 @@
 
 .kanban-columns {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(280px, 1fr));
+    gap: 1.5rem;
     height: 100%;
 }
 
 .kanban-column {
     background: rgba(15, 15, 18, 0.5);
     border: 1px solid var(--panel-border);
-    border-radius: 12px;
-    padding: 1rem;
+    border-radius: 16px;
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    min-height: 480px;
+    gap: 1.25rem;
+    min-height: 500px;
 }
 
 .column-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--panel-border);
-    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--panel-border);
+    padding-bottom: 0.75rem;
 }
 
 .column-header h3 {
     font-family: 'Cinzel', serif;
-    font-size: 0.95rem;
+    font-size: 1.1rem;
+    color: var(--text-primary);
 }
 
 .badge {
-    background: rgba(255,255,255,0.05);
-    padding: 0.15rem 0.5rem;
+    background: var(--panel-border-highlight);
+    color: var(--gold);
+    padding: 0.25rem 0.6rem;
     border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.8rem;
+    font-weight: 700;
 }
 
 .column-tasks {
@@ -159,39 +181,36 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    max-height: 480px;
-    padding-right: 0.25rem;
+    gap: 1rem;
+    max-height: 600px;
+    padding-right: 0.5rem;
 }
 
 /* Kanban Cards styling */
 .task-card {
     background: var(--panel-bg);
     border: 1px solid var(--panel-border);
-    border-radius: 10px;
-    padding: 1rem;
+    border-radius: 12px;
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
     position: relative;
-    border-left: 3px solid var(--text-secondary);
+    border-left: 4px solid var(--text-secondary);
     animation: slideIn 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
 }
 
+.task-card:hover { transform: translateY(-2px); }
 .task-card.pawn { border-left-color: var(--color-pawn); }
 .task-card.knight { border-left-color: var(--color-knight); }
 .task-card.rook { border-left-color: var(--color-rook); }
 .task-card.king { border-left-color: var(--color-king); }
 
 @keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .task-header {
@@ -200,109 +219,89 @@
     align-items: center;
 }
 
-.task-piece-indicator {
-    font-size: 1.4rem;
-}
-
+.task-piece-indicator { font-size: 1.6rem; }
 .pawn .task-piece-indicator { color: var(--color-pawn); }
 .knight .task-piece-indicator { color: var(--color-knight); }
 .rook .task-piece-indicator { color: var(--color-rook); }
 .king .task-piece-indicator { color: var(--color-king); }
 
 .task-board-pos {
-    font-size: 0.7rem;
-    background: rgba(255,255,255,0.04);
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
+    font-size: 0.75rem;
+    background: rgba(255,255,255,0.06);
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
     color: var(--text-secondary);
+    font-family: monospace;
+    font-weight: bold;
 }
 
 .task-text {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     color: var(--text-primary);
-    line-height: 1.4;
+    line-height: 1.5;
     word-break: break-word;
+}
+
+.task-meta {
+    font-size: 0.8rem; color: var(--text-secondary);
+    display: flex; flex-direction: column; gap: 0.4rem;
+    margin-top: 0.25rem;
+    border-top: 1px dashed rgba(255,255,255,0.1);
+    padding-top: 0.75rem;
+}
+.task-meta span.urgent {
+    color: var(--color-rook); font-weight: 700;
 }
 
 .task-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid rgba(255,255,255,0.03);
-    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 0.75rem;
+    margin-top: 0.25rem;
 }
 
-.phase-nav-btns {
-    display: flex;
-    gap: 0.25rem;
-}
+.phase-nav-btns { display: flex; gap: 0.4rem; }
 
 .nav-btn {
-    background: rgba(255,255,255,0.03);
+    background: rgba(255,255,255,0.05);
     border: 1px solid var(--panel-border);
     color: var(--text-secondary);
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 0.75rem;
+    font-size: 0.9rem;
     transition: all 0.2s;
 }
-
 .nav-btn:hover {
     color: var(--text-primary);
-    background: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.1);
 }
 
-.action-row {
-    display: flex;
-    gap: 0.25rem;
-}
+.action-row { display: flex; gap: 0.5rem; }
 
 .action-btn {
     border: none;
-    border-radius: 4px;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
+    border-radius: 6px;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 700;
+    transition: opacity 0.2s;
 }
+.action-btn:hover { opacity: 0.8; }
 
 .checkmate-btn {
-    background: rgba(52, 211, 153, 0.1);
+    background: rgba(52, 211, 153, 0.15);
     color: var(--color-knight);
+    border: 1px solid rgba(52, 211, 153, 0.3);
 }
-
-.checkmate-btn:hover {
-    background: var(--color-knight);
-    color: #111;
-}
+.checkmate-btn:hover { background: var(--color-knight); color: #000; }
 
 .capture-btn {
-    background: rgba(248, 113, 113, 0.1);
+    background: rgba(248, 113, 113, 0.15);
     color: var(--color-rook);
+    border: 1px solid rgba(248, 113, 113, 0.3);
 }
-
-.capture-btn:hover {
-    background: var(--color-rook);
-    color: #111;
-}
-
-.secondary-inputs {
-    margin-top: -0.5rem;
-}
-.secondary-inputs input {
-    background: rgba(0, 0, 0, 0.15);
-    font-size: 0.8rem;
-    padding: 0.6rem 0.8rem;
-}
-.task-meta {
-    font-size: 0.75rem; color: var(--text-secondary);
-    display: flex; flex-direction: column; gap: 0.25rem;
-    margin-top: 0.5rem;
-    border-top: 1px dashed rgba(255,255,255,0.05);
-    padding-top: 0.5rem;
-}
-.task-meta span.urgent {
-    color: var(--color-rook); font-weight: 600;
-}
-
+.capture-btn:hover { background: var(--color-rook); color: #000; }
