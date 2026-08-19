@@ -180,8 +180,11 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
 });
 
 document.getElementById('logout-btn').addEventListener('click', async () => {
-    playSound('capture');
-    await signOutUser();
+    const confirmLogout = confirm("Are you sure you want to resign from this match and log out?");
+    if (confirmLogout) {
+        playSound('capture');
+        await signOutUser();
+    }
 });
 
 // Toggle forms
