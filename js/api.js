@@ -1,38 +1,21 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "../config.js";
 
-// Initialize the Supabase client
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ==========================================
 // Authentication
 // ==========================================
 
-export async function signUpUser(email, username, password, avatar_url = null) {
+export async function signUpUser(email, username, password) {
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-            data: { username, avatar_url }
+            data: { username }
         }
     });
     return { data, error };
-}
-
-export async function signInWithGoogle() {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-    });
-    return { data, error };
-}
-
-export async function fetchLeaderboard() {
-    const { data, error } = await supabase
-        .from('leaderboard')
-        .select('*')
-        .limit(50);
-    if (error) console.error("Error fetching leaderboard:", error);
-    return data || [];
 }
 
 export async function signInUser(email, password) {
@@ -57,17 +40,38 @@ export function onAuthStateChange(callback) {
 }
 
 // ==========================================
-// Database Operations (CRUD)
+// Leaderboard
 // ==========================================
 
+export async function fetchLeaderboard(limit = 50) {
+    const { data, error } = await supabase
+        .from('leaderboard')
+        .select('*')
+        .limit(limit);
+    if (error) throw error;
+    return data || [];
+}
+
+export async function fetchUserRank(userElo) {
+    const { count, error } = await supabase
+        .from('leaderboard')
+        .select('*', { count: 'exact', head: true })
+        .gt('elo', userElo);
+    if (error) return null;
+    return (count || 0) + 1;
+}
+
+// ==========================================
 // Profiles
+// ==========================================
+
 export async function getProfile(userId) {
     const { data, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", userId)
         .single();
-    if (error) console.error("Error fetching profile:", error);
+    if (error) throw error;
     return data;
 }
 
@@ -76,31 +80,30 @@ export async function updateProfile(userId, updates) {
         .from("profiles")
         .update(updates)
         .eq("id", userId);
-    if (error) console.error("Error updating profile:", error);
+    if (error) throw error;
     return data;
 }
 
+// ==========================================
 // Tasks (Active Moves)
+// ==========================================
+
 export async function fetchTasks() {
     const { data, error } = await supabase
         .from("tasks")
         .select("*")
         .order("created_at", { ascending: false });
-    if (error) {
-        console.error("Error fetching tasks:", error);
-        return [];
-    }
+    if (error) throw error;
     return data;
 }
 
 export async function addTask(taskData) {
-    // taskData: { text, priority, phase, board_pos, user_id }
     const { data, error } = await supabase
         .from("tasks")
         .insert(taskData)
         .select()
         .single();
-    if (error) console.error("Error adding task:", error);
+    if (error) throw error;
     return data;
 }
 
@@ -111,7 +114,7 @@ export async function updateTask(taskId, updates) {
         .eq("id", taskId)
         .select()
         .single();
-    if (error) console.error("Error updating task:", error);
+    if (error) throw error;
     return data;
 }
 
@@ -120,31 +123,29 @@ export async function deleteTask(taskId) {
         .from("tasks")
         .delete()
         .eq("id", taskId);
-    if (error) console.error("Error deleting task:", error);
-    return !error;
+    if (error) throw error;
+    return true;
 }
 
-// Graveyard (Completed/Captured Moves)
+// ==========================================
+// Graveyard
+// ==========================================
+
 export async function fetchGraveyard() {
     const { data, error } = await supabase
         .from("graveyard")
         .select("*")
         .order("completed_at", { ascending: false });
-    if (error) {
-        console.error("Error fetching graveyard:", error);
-        return [];
-    }
+    if (error) throw error;
     return data;
 }
 
 export async function addToGraveyard(graveyardData) {
-    // graveyardData: { text, priority, user_id }
     const { data, error } = await supabase
         .from("graveyard")
         .insert(graveyardData)
         .select()
         .single();
-    if (error) console.error("Error adding to graveyard:", error);
+    if (error) throw error;
     return data;
 }
-

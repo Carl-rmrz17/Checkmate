@@ -2,6 +2,7 @@ import { supabase, signInUser, signUpUser, signOutUser, getSession, onAuthStateC
 import { playSound } from "./sounds.js";
 import { renderChessboard, getAvailableSquare, pieceIcons, piecePoints } from "./board.js";
 import { renderTasks } from "./tasks.js";
+import { showToast } from "./toasts.js";
 
 // Global App State
 let currentUser = null;
@@ -19,12 +20,12 @@ const themeSelect = document.getElementById('theme-select');
 const chessQuote = document.getElementById('chess-quote');
 
 const quotes = [
-    '"Every chess game is a new life." — Sergiu Samarian',
-    '"Play the opening like a book, the middlegame like a magician, and the endgame like a machine." — Rudolf Spielmann',
-    '"Chess is the struggle against the error." — Johannes Zukertort',
-    '"I don\'t believe in psychology. I believe in good moves." — Bobby Fischer',
-    '"The most powerful weapon in chess is to have the next move." — David Bronstein',
-    '"Chess is a war over the board. The object is to crush the opponent\'s mind." — Bobby Fischer'
+    '"Every chess game is a new life." â€” Sergiu Samarian',
+    '"Play the opening like a book, the middlegame like a magician, and the endgame like a machine." â€” Rudolf Spielmann',
+    '"Chess is the struggle against the error." â€” Johannes Zukertort',
+    '"I don\'t believe in psychology. I believe in good moves." â€” Bobby Fischer',
+    '"The most powerful weapon in chess is to have the next move." â€” David Bronstein',
+    '"Chess is a war over the board. The object is to crush the opponent\'s mind." â€” Bobby Fischer'
 ];
 
 function getTitle(elo) {
@@ -65,12 +66,18 @@ function renderGraveyardUI() {
     container.innerHTML = '';
     
     graveyardList.forEach(item => {
+        let iconName = 'arrow-up';
+        if (item.priority === 'knight') iconName = 'navigation';
+        if (item.priority === 'rook') iconName = 'tower-control';
+        if (item.priority === 'king') iconName = 'crown';
+        
         const span = document.createElement('span');
         span.className = 'captured-piece';
-        span.innerHTML = pieceIcons[item.priority] || '♙';
+        span.innerHTML = `<i data-lucide="${iconName}" style="width:16px;height:16px;"></i>`;
         span.title = `Checkmated: "${item.text}"`;
         container.appendChild(span);
     });
+    if (window.lucide) window.lucide.createIcons({ root: container });
 }
 
 function refreshAll() {
@@ -99,7 +106,7 @@ async function loadUserData(userId) {
         if (profile.avatar_url) {
             avatarContainer.innerHTML = `<img src="${profile.avatar_url}" class="profile-img" alt="Avatar">`;
         } else {
-            avatarContainer.innerHTML = `<span class="player-piece">♔</span>`;
+            avatarContainer.innerHTML = `<span class="player-piece">â™”</span>`;
         }
 
         applyTheme(profile.theme || 'obsidian');
@@ -128,65 +135,86 @@ onAuthStateChange(async (event, session) => {
     }
 });
 
+
+function getReadableError(error) {
+    const msg = error.message.toLowerCase();
+    if (msg.includes("invalid login credentials")) return "Incorrect email or password.";
+    if (msg.includes("already registered")) return "An account with this email already exists.";
+    if (msg.includes("password should be at least")) return "Password is too weak. Please use at least 6 characters.";
+    return error.message;
+}
+
+function setBtnLoading(btn, isLoading, originalText) {
+    if (isLoading) {
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Loading...';
+    } else {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+    if (window.lucide) window.lucide.createIcons();
+}
+
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const errorMsg = document.getElementById('login-error');
-    errorMsg.innerText = 'Loading...';
+    const btn = e.target.querySelector('button[type="submit"]');
+    setBtnLoading(btn, true, 'Sign In');
     
     const email = document.getElementById('login-email').value.trim();
     const p = document.getElementById('login-password').value;
     
     const { error } = await signInUser(email, p);
     if (error) {
-        errorMsg.innerText = error.message;
+        showToast('error', 'Login Failed', getReadableError(error));
+        setBtnLoading(btn, false, 'Sign In');
     } else {
-        errorMsg.innerText = '';
         playSound('move');
+        showToast('success', 'Welcome Back', 'Successfully logged into the arena.');
+        setBtnLoading(btn, false, 'Sign In');
     }
 });
 
 document.getElementById('register-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const errorMsg = document.getElementById('register-error');
-    const successMsg = document.getElementById('register-success');
-    errorMsg.innerText = 'Creating profile...';
-    successMsg.innerText = '';
+    const btn = e.target.querySelector('button[type="submit"]');
     
     const email = document.getElementById('register-email').value.trim();
-    const u = document.getElementById('register-username').value.trim();
+    const username = document.getElementById('register-username').value.trim();
     const p = document.getElementById('register-password').value;
-    const confirmP = document.getElementById('register-confirm-password').value;
-    const a = document.getElementById('register-avatar').value.trim();
+    const cp = document.getElementById('register-confirm-password').value;
     
-    if (p !== confirmP) {
-        errorMsg.innerText = "Passwords do not match!";
+    if (p !== cp) {
+        showToast('warning', 'Mismatch', 'Passwords do not match.');
         return;
     }
     
-    const { error } = await signUpUser(email, u, p, a || null);
+    setBtnLoading(btn, true, 'Create Account');
+    
+    const { error } = await signUpUser(email, username, p);
+    
     if (error) {
-        errorMsg.innerText = error.message;
+        showToast('error', 'Registration Failed', getReadableError(error));
+        setBtnLoading(btn, false, 'Create Account');
     } else {
-        errorMsg.innerText = '';
-        successMsg.innerText = 'Profile created! Please check your email to verify your account (if enabled), or Sign In.';
+        playSound('capture');
+        showToast('success', 'Profile Created', 'Welcome to CheckMate! You may now sign in.');
+        
         setTimeout(() => {
             document.getElementById('register-form').classList.remove('active');
             document.getElementById('login-form').classList.add('active');
             document.getElementById('login-email').value = email;
             document.getElementById('login-password').value = '';
-            successMsg.innerText = '';
-        }, 3000);
+            setBtnLoading(btn, false, 'Create Account');
+        }, 1500);
     }
 });
 
 document.getElementById('logout-btn').addEventListener('click', () => {
     document.getElementById('logout-modal').classList.remove('hidden');
 });
-
 document.getElementById('cancel-logout-btn').addEventListener('click', () => {
     document.getElementById('logout-modal').classList.add('hidden');
 });
-
 document.getElementById('confirm-logout-btn').addEventListener('click', async () => {
     document.getElementById('logout-modal').classList.add('hidden');
     playSound('capture');
@@ -206,7 +234,34 @@ document.getElementById('to-login').addEventListener('click', (e) => {
 });
 
 // ---------------------------------------------------------
+// Mobile Drawer & Password Toggles
+// ---------------------------------------------------------
+document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.add('open');
+});
+document.getElementById('close-sidebar-btn')?.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('open');
+});
+
+document.querySelectorAll('.password-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.setAttribute('data-lucide', 'eye-off');
+        } else {
+            input.type = 'password';
+            icon.setAttribute('data-lucide', 'eye');
+        }
+        if (window.lucide) window.lucide.createIcons({ root: btn });
+    });
+});
+
+// ---------------------------------------------------------
 // Theme Selector
+
 // ---------------------------------------------------------
 if (themeSelect) {
     themeSelect.addEventListener('change', async (e) => {
@@ -238,29 +293,52 @@ document.getElementById('todo-form').addEventListener('submit', async (e) => {
     let due_date = dueDateInput.value ? new Date(dueDateInput.value).toISOString() : null;
     let notes = notesInput.value.trim() || null;
     
+    // Optimistic setup
+    const tempId = 'temp-' + Date.now();
     const newTask = {
+        id: tempId,
         user_id: currentUser.id,
         text,
         priority,
         phase: 'opening',
         board_pos,
         due_date,
-        notes
+        notes,
+        created_at: new Date().toISOString()
     };
     
-    const addedTask = await addTask(newTask);
-    if (addedTask) {
-        tasksList.unshift(addedTask);
-        playSound('move');
-        input.value = '';
-        dueDateInput.value = '';
-        notesInput.value = '';
-        chessQuote.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+    // Optimistic update
+    tasksList.unshift(newTask);
+    playSound('move');
+    input.value = '';
+    dueDateInput.value = '';
+    notesInput.value = '';
+    chessQuote.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+    refreshAll();
+    
+    // DB sync
+    try {
+        const addedTask = await addTask({
+            user_id: newTask.user_id,
+            text: newTask.text,
+            priority: newTask.priority,
+            phase: newTask.phase,
+            board_pos: newTask.board_pos,
+            due_date: newTask.due_date,
+            notes: newTask.notes
+        });
+        // Replace temp task with real task
+        tasksList = tasksList.map(t => t.id === tempId ? addedTask : t);
+        showToast('success', 'Move Played', 'Task successfully added.');
+    } catch (err) {
+        // Rollback
+        tasksList = tasksList.filter(t => t.id !== tempId);
         refreshAll();
+        showToast('error', 'Sync Failed', 'Failed to save task to database.');
     }
 });
 
-async function handleMovePhase(task, direction) {
+window.handleMovePhase = async function(task, direction) {
     const phaseOrder = ['opening', 'middlegame', 'endgame'];
     const currentIdx = phaseOrder.indexOf(task.phase);
     
@@ -269,6 +347,9 @@ async function handleMovePhase(task, direction) {
     if (direction === 'prev' && currentIdx > 0) newIdx--;
     
     if (newIdx !== currentIdx) {
+        const oldPhase = task.phase;
+        const oldPos = task.board_pos;
+        
         const newPhase = phaseOrder[newIdx];
         const newPos = getAvailableSquare(newPhase, tasksList.filter(t => t.id !== task.id));
         
@@ -278,11 +359,23 @@ async function handleMovePhase(task, direction) {
         playSound('move');
         refreshAll();
         
-        await updateTask(task.id, { phase: newPhase, board_pos: newPos });
+        try {
+            await updateTask(task.id, { phase: newPhase, board_pos: newPos });
+        } catch (err) {
+            // Rollback
+            task.phase = oldPhase;
+            task.board_pos = oldPos;
+            refreshAll();
+            showToast('error', 'Sync Failed', 'Failed to update task phase.');
+        }
     }
 }
 
-async function handleCheckmate(task) {
+window.handleCheckmate = async function(task) {
+    const backupTasksList = [...tasksList];
+    const backupGraveyard = [...graveyardList];
+    const backupElo = profile.elo;
+    
     // Optimistic UI update
     tasksList = tasksList.filter(t => t.id !== task.id);
     graveyardList.unshift(task);
@@ -290,17 +383,31 @@ async function handleCheckmate(task) {
     playSound('checkmate');
     refreshAll();
     
-    // DB sync
-    await addToGraveyard({
-        user_id: currentUser.id,
-        text: task.text,
-        priority: task.priority
-    });
-    await deleteTask(task.id);
-    await updateProfile(currentUser.id, { elo: profile.elo });
+    try {
+        // DB sync
+        await addToGraveyard({
+            user_id: currentUser.id,
+            text: task.text,
+            priority: task.priority
+        });
+        await deleteTask(task.id);
+        await updateProfile(currentUser.id, { elo: profile.elo });
+        showToast('success', 'Checkmate!', 'Task completed successfully.');
+    } catch (err) {
+        // Rollback
+        tasksList = backupTasksList;
+        graveyardList = backupGraveyard;
+        profile.elo = backupElo;
+        refreshAll();
+        showToast('error', 'Sync Failed', 'Failed to mark task as checkmate.');
+    }
 }
 
-async function handleCapture(task) {
+window.handleCapture = async function(task) {
+    const backupTasksList = [...tasksList];
+    const backupCapturedCount = profile.captured_count;
+    const backupElo = profile.elo;
+    
     // Optimistic UI update
     tasksList = tasksList.filter(t => t.id !== task.id);
     profile.captured_count += 1;
@@ -308,9 +415,19 @@ async function handleCapture(task) {
     playSound('capture');
     refreshAll();
     
-    // DB sync
-    await deleteTask(task.id);
-    await updateProfile(currentUser.id, { elo: profile.elo, captured_count: profile.captured_count });
+    try {
+        // DB sync
+        await deleteTask(task.id);
+        await updateProfile(currentUser.id, { elo: profile.elo, captured_count: profile.captured_count });
+        showToast('info', 'Task Captured', 'Task was deleted.');
+    } catch (err) {
+        // Rollback
+        tasksList = backupTasksList;
+        profile.captured_count = backupCapturedCount;
+        profile.elo = backupElo;
+        refreshAll();
+        showToast('error', 'Sync Failed', 'Failed to delete task.');
+    }
 }
 
 // ---------------------------------------------------------

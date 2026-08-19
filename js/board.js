@@ -4,10 +4,10 @@ const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 const ranks = [8, 7, 6, 5, 4, 3, 2, 1];
 
 export const pieceIcons = {
-    pawn: '♙',
-    knight: '♘',
-    rook: '♖',
-    king: '♔'
+    pawn: 'arrow-up',
+    knight: 'navigation',
+    rook: 'tower-control',
+    king: 'crown'
 };
 
 export const piecePoints = {
@@ -32,18 +32,17 @@ export function renderChessboard(tasks) {
         for (let f = 0; f < 8; f++) {
             const squareName = files[f] + ranks[r];
             const square = document.createElement('div');
-            square.className = `board-square ${(r + f) % 2 === 0 ? 'light' : 'dark'}`;
+            square.className = `square ${(r + f) % 2 === 0 ? 'light' : 'dark'}`;
             square.dataset.coord = squareName;
             
             const task = pieceMap[squareName];
             if (task) {
-                const piece = document.createElement('span');
-                piece.className = 'board-piece';
-                piece.innerHTML = pieceIcons[task.priority];
-                piece.title = `[${task.priority.toUpperCase()}] ${task.text}`;
-                square.appendChild(piece);
+                square.classList.add('has-task');
+                square.title = `[${task.priority.toUpperCase()}] ${task.text}`;
                 
-                // Clicking square highlights the task card
+                const iconName = pieceIcons[task.priority];
+                square.innerHTML = `<i data-lucide="${iconName}" class="piece-icon"></i>`;
+                
                 square.addEventListener('click', () => {
                     highlightTaskCard(task.id, task.board_pos);
                 });
@@ -52,6 +51,8 @@ export function renderChessboard(tasks) {
             board.appendChild(square);
         }
     }
+    
+    if (window.lucide) window.lucide.createIcons({ root: board });
 }
 
 export function getAvailableSquare(phase, currentTasks) {
@@ -61,25 +62,20 @@ export function getAvailableSquare(phase, currentTasks) {
     
     const activePositions = currentTasks.map(t => t.board_pos);
     
-    // Try to find a free square randomly
     let attempts = 0;
     while (attempts < 100) {
         const randFile = files[Math.floor(Math.random() * 8)];
         const randRank = allowedRanks[Math.floor(Math.random() * allowedRanks.length)];
         const candidate = randFile + randRank;
-        
-        if (!activePositions.includes(candidate)) {
-            return candidate;
-        }
+        if (!activePositions.includes(candidate)) return candidate;
         attempts++;
     }
     
-    // Fallback: search exhaustively
     for (let rank of allowedRanks) {
         for (let file of files) {
             const pos = file + rank;
             if (!activePositions.includes(pos)) return pos;
         }
     }
-    return 'e2'; // absolute fallback
+    return 'e2';
 }

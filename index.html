@@ -2,39 +2,33 @@
 <html lang="en" data-theme="obsidian">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkmate - Grandmaster Edition To-Do Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CheckMate</title>
+    <link rel="icon" type="image/svg+xml" href="assets/checkmate-icon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="css/board.css">
     <link rel="stylesheet" href="css/kanban.css">
+    <link rel="stylesheet" href="css/toasts.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
     <!-- Authentication Overlay -->
     <div id="auth-overlay" class="auth-overlay">
         <div class="auth-card">
             <div class="auth-logo">
-                <span class="logo-icon">♔</span>
-                <h1>Checkmate</h1>
+                <i data-lucide="crown" class="logo-icon"></i>
+                <h1>CheckMate</h1>
             </div>
-            <p class="auth-subtitle">Grandmaster Edition Arena</p>
+            <p class="auth-subtitle">Log in to your account</p>
             
-            <!-- Google Login Button -->
-            <button id="google-login-btn" class="oauth-btn" type="button">
-                <svg width="20" height="20" viewBox="0 0 48 48">
-                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                </svg>
-                Sign in with Google
-            </button>
-
-            <div class="divider"><span>OR</span></div>
-
             <!-- Login Form -->
             <form id="login-form" class="auth-form active">
                 <div class="input-group">
@@ -45,11 +39,13 @@
                     <label>Password</label>
                     <div class="password-wrapper">
                         <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">
-                        <button type="button" class="password-toggle-btn" data-target="login-password">👁️</button>
+                        <button type="button" class="password-toggle-btn" data-target="login-password">
+                            <i data-lucide="eye" class="eye-icon"></i>
+                        </button>
                     </div>
                 </div>
                 <div id="login-error" class="auth-error-msg"></div>
-                <button type="submit" class="auth-btn">Begin Match (Log In)</button>
+                <button type="submit" class="auth-btn btn-primary">Sign In</button>
                 <p class="switch-form-text">Don't have an account? <a href="#" id="to-register">Sign Up</a></p>
             </form>
 
@@ -67,23 +63,23 @@
                     <label>Password</label>
                     <div class="password-wrapper">
                         <input type="password" id="register-password" placeholder="Choose a secure password" required minlength="6" autocomplete="new-password">
-                        <button type="button" class="password-toggle-btn" data-target="register-password">👁️</button>
+                        <button type="button" class="password-toggle-btn" data-target="register-password">
+                            <i data-lucide="eye" class="eye-icon"></i>
+                        </button>
                     </div>
                 </div>
                 <div class="input-group">
                     <label>Confirm Password</label>
                     <div class="password-wrapper">
                         <input type="password" id="register-confirm-password" placeholder="Type password again" required minlength="6" autocomplete="new-password">
-                        <button type="button" class="password-toggle-btn" data-target="register-confirm-password">👁️</button>
+                        <button type="button" class="password-toggle-btn" data-target="register-confirm-password">
+                            <i data-lucide="eye" class="eye-icon"></i>
+                        </button>
                     </div>
-                </div>
-                <div class="input-group">
-                    <label>Avatar URL (Optional)</label>
-                    <input type="url" id="register-avatar" placeholder="Avatar Image URL" autocomplete="off">
                 </div>
                 <div id="register-error" class="auth-error-msg"></div>
                 <div id="register-success" class="auth-success-msg"></div>
-                <button type="submit" class="auth-btn">Enlist (Register)</button>
+                <button type="submit" class="auth-btn btn-primary">Create Account</button>
                 <p class="switch-form-text">Already registered? <a href="#" id="to-login">Log In</a></p>
             </form>
         </div>
@@ -91,29 +87,49 @@
 
     <!-- App Container -->
     <div id="app-container" class="app-container authenticated-only">
+        
+        <!-- Mobile Header (Visible only on small screens) -->
+        <header class="mobile-header">
+            <div class="mobile-logo">
+                <i data-lucide="crown" class="logo-icon"></i>
+                <h2>CheckMate</h2>
+            </div>
+            <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Open menu">
+                <i data-lucide="menu"></i>
+            </button>
+        </header>
+
         <!-- Sidebar / Player Profile -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
+            <button id="close-sidebar-btn" class="close-sidebar-btn" aria-label="Close menu">
+                <i data-lucide="x"></i>
+            </button>
             <div class="logo-area">
-                <span class="logo-icon">♔</span>
-                <h1>Checkmate</h1>
+                <i data-lucide="crown" class="logo-icon"></i>
+                <h1>CheckMate</h1>
             </div>
             
             <div class="player-card">
-                <div class="avatar-area" id="profile-avatar-container">
-                    <span class="player-piece">♔</span>
+                <div class="avatar-circle">
+                    <span id="avatar-initials" class="avatar-initials">?</span>
                 </div>
                 <div class="player-info">
-                    <h2 id="display-username" class="player-name">Grandmaster</h2>
-                    <div class="player-rank">
-                        <span id="player-title" class="title-value">Contender</span>
-                        <span class="separator">•</span>
-                        <span id="elo-rating" class="rating-value">1200</span>
+                    <h2 id="display-username">Loading...</h2>
+                    <div class="player-stats">
+                        <span id="player-title" class="player-title">Contender</span>
+                        <span class="dot">&bull;</span>
+                        <span id="elo-rating" class="elo-rating">1200</span>
                     </div>
                 </div>
-                <button id="logout-btn" class="logout-btn" title="Resign Match (Log Out)">⏻</button>
+                <button id="logout-btn" class="logout-btn" title="Resign Match (Log Out)">
+                    <i data-lucide="power"></i>
+                </button>
             </div>
 
-            <button id="leaderboard-btn" class="sidebar-action-btn">🏆 Global Leaderboard</button>
+            <button id="leaderboard-btn" class="sidebar-action-btn">
+                <i data-lucide="trophy"></i>
+                Global Leaderboard
+            </button>
 
             <!-- Theme Switcher -->
             <div class="theme-panel">
@@ -178,19 +194,19 @@
                         <div class="piece-options">
                             <label class="piece-option">
                                 <input type="radio" name="priority" value="pawn" checked>
-                                <span class="piece-btn">♙ <span>Pawn</span></span>
+                                <span class="piece-btn"><i data-lucide="arrow-up"></i> <span>Pawn</span></span>
                             </label>
                             <label class="piece-option">
                                 <input type="radio" name="priority" value="knight">
-                                <span class="piece-btn">♘ <span>Knight</span></span>
+                                <span class="piece-btn"><i data-lucide="navigation"></i> <span>Knight</span></span>
                             </label>
                             <label class="piece-option">
                                 <input type="radio" name="priority" value="rook">
-                                <span class="piece-btn">♖ <span>Rook</span></span>
+                                <span class="piece-btn"><i data-lucide="tower-control"></i> <span>Rook</span></span>
                             </label>
                             <label class="piece-option">
                                 <input type="radio" name="priority" value="king">
-                                <span class="piece-btn">♔ <span>King</span></span>
+                                <span class="piece-btn"><i data-lucide="crown"></i> <span>King</span></span>
                             </label>
                         </div>
                     </div>
@@ -247,33 +263,48 @@
     <div id="leaderboard-modal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-header">
-                <h2>🏆 Global Leaderboard</h2>
-                <button class="close-modal-btn" id="close-leaderboard">&times;</button>
+                <h2><i data-lucide="trophy"></i> Global Leaderboard</h2>
+                <button class="close-modal-btn" id="close-leaderboard" aria-label="Close modal">
+                    <i data-lucide="x"></i>
+                </button>
             </div>
             <div class="modal-content">
+                <!-- User's Pinned Position -->
+                <div id="pinned-user-rank" class="pinned-rank hidden">
+                    <!-- Dynamic -->
+                </div>
                 <div class="leaderboard-list" id="leaderboard-list">
                     <!-- Dynamic content -->
                 </div>
+            </div>
+            <div class="modal-footer">
+                <p class="helper-text">Top players by rating. Ratings update in real-time.</p>
             </div>
         </div>
     </div>
     
     <!-- Logout Modal -->
     <div id="logout-modal" class="modal-overlay hidden">
-        <div class="modal-card" style="max-width: 400px; text-align: center;">
-            <div class="modal-header" style="justify-content: center; border-bottom: none;">
-                <h2 style="color: var(--color-rook);">Resign Match?</h2>
+        <div class="modal-card logout-modal-card">
+            <div class="modal-header border-none">
+                <h2 class="text-error"><i data-lucide="log-out"></i> Resign Match?</h2>
+                <button class="close-modal-btn" id="close-logout-x" aria-label="Close modal">
+                    <i data-lucide="x"></i>
+                </button>
             </div>
-            <div class="modal-content" style="padding-top: 0;">
-                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Are you sure you want to log out and leave the arena?</p>
-                <div style="display: flex; gap: 1rem; justify-content: center;">
-                    <button id="cancel-logout-btn" class="nav-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem;">Cancel</button>
-                    <button id="confirm-logout-btn" class="action-btn capture-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem;">Yes, Log Out</button>
-                </div>
+            <div class="modal-content no-padding-top text-center">
+                <p class="text-secondary mb-lg">Are you sure you want to log out and leave the arena?</p>
+            </div>
+            <div class="modal-footer justify-center border-none">
+                <button id="cancel-logout-btn" class="nav-btn">Cancel</button>
+                <button id="confirm-logout-btn" class="action-btn capture-btn">Yes, Log Out</button>
             </div>
         </div>
     </div>
     
+    <script>
+        lucide.createIcons();
+    </script>
     <script type="module" src="js/main.js"></script>
 </body>
 </html>
