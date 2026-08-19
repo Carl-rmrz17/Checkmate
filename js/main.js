@@ -140,6 +140,7 @@ function getReadableError(error) {
     const msg = error.message.toLowerCase();
     if (msg.includes("invalid login credentials")) return "Incorrect email or password.";
     if (msg.includes("already registered")) return "An account with this email already exists.";
+    if (msg.includes("email not confirmed")) return "Please check your email and click the confirmation link before signing in.";
     if (msg.includes("password should be at least")) return "Password is too weak. Please use at least 6 characters.";
     return error.message;
 }
@@ -197,7 +198,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
         setBtnLoading(btn, false, 'Create Account');
     } else {
         playSound('capture');
-        showToast('success', 'Profile Created', 'Welcome to CheckMate! You may now sign in.');
+        showToast('success', 'Profile Created', 'Important: Please check your email inbox to verify your account before signing in!');
         
         setTimeout(() => {
             document.getElementById('register-form').classList.remove('active');
