@@ -109,9 +109,6 @@ async function loadUserData(userId) {
             } else {
                 avatarCircle.innerHTML = `<span id="avatar-initials" class="avatar-initials">${profile.username ? profile.username.charAt(0).toUpperCase() : '?'}</span>`;
             }
-        }" class="profile-img" alt="Avatar">`;
-        } else {
-            avatarContainer.innerHTML = `<span class="player-piece">â™”</span>`;
         }
 
         applyTheme(profile.theme || 'obsidian');
@@ -631,8 +628,12 @@ window.addEventListener('click', (e) => {
         teardownLeaderboardRealtime();
     }
     const logoutModal = document.getElementById('logout-modal');
-    if (e.target === logoutModal) { logoutModal.classList.add('hidden'); } const settingsModalEl = document.getElementById('settings-modal'); if (e.target === settingsModalEl) { settingsModalEl.classList.add('hidden'); } if (false) {
+    if (e.target === logoutModal) {
         logoutModal.classList.add('hidden');
+    }
+    const settingsModalEl = document.getElementById('settings-modal');
+    if (e.target === settingsModalEl) {
+        settingsModalEl.classList.add('hidden');
     }
 });
 
