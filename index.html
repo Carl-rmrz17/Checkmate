@@ -131,6 +131,11 @@
                 Global Leaderboard
             </button>
 
+                        <button id="settings-btn" class="sidebar-action-btn">
+                <i data-lucide="settings"></i>
+                Account Settings
+            </button>
+            
             <!-- Theme Switcher -->
             <div class="theme-panel">
                 <label for="theme-select">Chess Board Theme</label>
@@ -181,7 +186,7 @@
                 <form id="todo-form" class="move-form">
                     <div class="input-row main-input">
                         <input type="text" id="task-input" placeholder="e.g., Design frontend framework layer..." required autocomplete="off">
-                        <button type="submit" class="play-btn">Play Move (Add)</button>
+                        <button type="submit" class="btn-primary">Play Move (Add)</button>
                     </div>
                     
                     <div class="input-row secondary-inputs">
@@ -279,6 +284,37 @@
             </div>
             <div class="modal-footer">
                 <p class="helper-text">Top players by rating. Ratings update in real-time.</p>
+            </div>
+        </div>
+    </div>
+    
+        <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i data-lucide="settings"></i> Account Settings</h2>
+                <button class="close-modal-btn" id="close-settings-btn" aria-label="Close modal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <form id="settings-form">
+                    <div class="input-group">
+                        <label>Update Username</label>
+                        <input type="text" id="settings-username" placeholder="New username" minlength="3">
+                    </div>
+                                        <div class="input-group">
+                        <label>Profile Picture URL</label>
+                        <input type="url" id="settings-avatar" placeholder="https://example.com/avatar.png">
+                    </div>
+                    <div class="input-group">
+                        <label>Change Password</label>
+                        <input type="password" id="settings-password" placeholder="New password" minlength="6">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-center">
+                <button id="save-settings-btn" class="btn-primary" style="width: 100%;">Save Changes</button>
             </div>
         </div>
     </div>

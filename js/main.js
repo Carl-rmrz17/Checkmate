@@ -1,4 +1,4 @@
-import { supabase, signInUser, signUpUser, signOutUser, getSession, onAuthStateChange, getProfile, updateProfile, fetchTasks, addTask, updateTask, deleteTask, fetchGraveyard, addToGraveyard, fetchLeaderboard } from "./api.js";
+import { supabase, signInUser, signUpUser, signOutUser, getSession, onAuthStateChange, getProfile, updateProfile, updateUserPassword, fetchTasks, addTask, updateTask, deleteTask, fetchGraveyard, addToGraveyard, fetchLeaderboard } from "./api.js";
 import { playSound } from "./sounds.js";
 import { renderChessboard, getAvailableSquare, pieceIcons, piecePoints } from "./board.js";
 import { renderTasks } from "./tasks.js";
@@ -56,7 +56,7 @@ function updateStatsUI() {
     document.getElementById('stat-captured').innerText = profile.captured_count;
     
     const totalFinished = completedCount + profile.captured_count;
-    const winrate = totalFinished === 0 ? 100 : Math.round((completedCount / totalFinished) * 100);
+    const winrate = totalFinished === 0 ? 0 : Math.round((completedCount / totalFinished) * 100);
     document.getElementById('stat-winrate').innerText = `${winrate}%`;
 }
 
@@ -102,9 +102,14 @@ async function loadUserData(userId) {
         
         displayUsername.innerText = profile.username;
         
-        const avatarContainer = document.getElementById('profile-avatar-container');
-        if (profile.avatar_url) {
-            avatarContainer.innerHTML = `<img src="${profile.avatar_url}" class="profile-img" alt="Avatar">`;
+        const avatarCircle = document.querySelector('.avatar-circle');
+        if (avatarCircle) {
+            if (profile.avatar_url) {
+                avatarCircle.innerHTML = `<img src="${profile.avatar_url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            } else {
+                avatarCircle.innerHTML = `<span id="avatar-initials" class="avatar-initials">${profile.username ? profile.username.charAt(0).toUpperCase() : '?'}</span>`;
+            }
+        }" class="profile-img" alt="Avatar">`;
         } else {
             avatarContainer.innerHTML = `<span class="player-piece">â™”</span>`;
         }
@@ -529,6 +534,96 @@ closeLeaderboardBtn?.addEventListener("click", () => {
     teardownLeaderboardRealtime();
 });
 
+
+// ---------------------------------------------------------
+// Settings Modal
+// ---------------------------------------------------------
+const settingsBtn = document.getElementById("settings-btn");
+const settingsModal = document.getElementById("settings-modal");
+const closeSettingsBtn = document.getElementById("close-settings-btn");
+const saveSettingsBtn = document.getElementById("save-settings-btn");
+const settingsUsername = document.getElementById("settings-username");
+const settingsPassword = document.getElementById("settings-password");
+const settingsAvatar = document.getElementById("settings-avatar");
+
+settingsBtn?.addEventListener("click", () => {
+    if (profile) {
+        settingsUsername.value = profile.username || "";
+        settingsAvatar.value = profile.avatar_url || "";
+    }
+    settingsPassword.value = "";
+    settingsModal.classList.remove("hidden");
+});
+
+closeSettingsBtn?.addEventListener("click", () => {
+    settingsModal.classList.add("hidden");
+});
+
+saveSettingsBtn?.addEventListener("click", async () => {
+    if (!currentUser || !profile) return;
+    
+    setBtnLoading(saveSettingsBtn, true, 'Save Changes');
+    
+    let hasError = false;
+    let hasChanges = false;
+    
+    const newUsername = settingsUsername.value.trim();
+    if (newUsername && newUsername !== profile.username) {
+        try {
+            await updateProfile(currentUser.id, { username: newUsername });
+            profile.username = newUsername;
+            displayUsername.innerText = newUsername;
+            if (document.getElementById('avatar-initials')) {
+                document.getElementById('avatar-initials').innerText = newUsername.charAt(0).toUpperCase();
+            }
+            hasChanges = true;
+        } catch (err) {
+            hasError = true;
+            showToast('error', 'Update Failed', 'Failed to update username. It might be taken.');
+        }
+    }
+    
+    
+    const newAvatar = settingsAvatar.value.trim();
+    if (newAvatar !== (profile.avatar_url || "")) {
+        try {
+            await updateProfile(currentUser.id, { avatar_url: newAvatar });
+            profile.avatar_url = newAvatar;
+            
+            const avatarCircle = document.querySelector('.avatar-circle');
+            if (newAvatar) {
+                avatarCircle.innerHTML = `<img src="${newAvatar}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            } else {
+                avatarCircle.innerHTML = `<span id="avatar-initials" class="avatar-initials">${profile.username ? profile.username.charAt(0).toUpperCase() : '?'}</span>`;
+            }
+            hasChanges = true;
+        } catch (err) {
+            hasError = true;
+            showToast('error', 'Update Failed', 'Failed to update profile picture.');
+        }
+    }
+    
+    const newPassword = settingsPassword.value;
+    if (newPassword && newPassword.length >= 6) {
+        const { error } = await updateUserPassword(newPassword);
+        if (error) {
+            hasError = true;
+            showToast('error', 'Password Failed', error.message);
+        } else {
+            hasChanges = true;
+        }
+    }
+    
+    setBtnLoading(saveSettingsBtn, false, 'Save Changes');
+    
+    if (!hasError && hasChanges) {
+        showToast('success', 'Profile Updated', 'Your settings were saved successfully.');
+        settingsModal.classList.add("hidden");
+    } else if (!hasChanges) {
+        settingsModal.classList.add("hidden");
+    }
+});
+
 // Close modals when clicking outside
 window.addEventListener('click', (e) => {
     if (e.target === leaderboardModal) {
@@ -536,7 +631,7 @@ window.addEventListener('click', (e) => {
         teardownLeaderboardRealtime();
     }
     const logoutModal = document.getElementById('logout-modal');
-    if (e.target === logoutModal) {
+    if (e.target === logoutModal) { logoutModal.classList.add('hidden'); } const settingsModalEl = document.getElementById('settings-modal'); if (e.target === settingsModalEl) { settingsModalEl.classList.add('hidden'); } if (false) {
         logoutModal.classList.add('hidden');
     }
 });
@@ -546,6 +641,7 @@ window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         leaderboardModal?.classList.add("hidden");
         document.getElementById('logout-modal')?.classList.add('hidden');
+        document.getElementById('settings-modal')?.classList.add('hidden');
         teardownLeaderboardRealtime();
     }
 });

@@ -39,6 +39,13 @@ export function onAuthStateChange(callback) {
     return supabase.auth.onAuthStateChange(callback);
 }
 
+export async function updateUserPassword(newPassword) {
+    const { data, error } = await supabase.auth.updateUser({
+        password: newPassword
+    });
+    return { data, error };
+}
+
 // ==========================================
 // Leaderboard
 // ==========================================
