@@ -4,6 +4,7 @@
     border: 1px solid var(--panel-border);
     border-radius: 14px;
     padding: 1.25rem 1.5rem;
+    -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
 }
 
