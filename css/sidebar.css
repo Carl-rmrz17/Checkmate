@@ -185,14 +185,41 @@
     gap: 4px;
 }
 
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: calc(var(--z-drawer) - 1);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 /* Mobile Drawer Mode */
 @media (max-width: 1024px) {
     .sidebar {
         position: fixed;
         top: 0;
         left: 0;
+        width: 290px;
+        max-width: 85vw;
+        height: 100vh;
+        height: 100dvh;
         transform: translateX(-100%);
         box-shadow: var(--shadow-lg);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        z-index: var(--z-drawer);
     }
     
     .sidebar.open {

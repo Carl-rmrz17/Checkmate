@@ -436,25 +436,104 @@ input:disabled {
     padding: var(--space-xs);
 }
 
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
 @media (max-width: 1024px) {
     .app-container {
         flex-direction: column;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
     }
     
     .mobile-header {
         display: flex;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        flex-shrink: 0;
     }
     
     .top-header {
         display: none;
     }
+
+    .main-content {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
     
     .command-center {
         padding: var(--space-md);
+        flex-shrink: 0;
     }
     
     .input-row {
         flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    .secondary-inputs {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    .piece-options {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-xs);
+    }
+
+    .piece-btn {
+        padding: var(--space-xs) 2px;
+        font-size: 0.8rem;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .play-area {
+        flex: initial;
+        overflow: visible;
+        flex-direction: column;
+        padding: var(--space-md);
+        gap: var(--space-lg);
+        min-height: min-content;
+    }
+}
+
+@media (max-width: 480px) {
+    .command-center {
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    .piece-options {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-xs);
+    }
+
+    .piece-btn {
+        flex-direction: row;
+        padding: var(--space-xs) var(--space-sm);
+        gap: var(--space-xs);
     }
 }
 /* ==========================================================================

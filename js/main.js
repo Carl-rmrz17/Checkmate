@@ -239,12 +239,22 @@ document.getElementById('to-login').addEventListener('click', (e) => {
 // ---------------------------------------------------------
 // Mobile Drawer & Password Toggles
 // ---------------------------------------------------------
-document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
-    document.getElementById('sidebar').classList.add('open');
-});
-document.getElementById('close-sidebar-btn')?.addEventListener('click', () => {
-    document.getElementById('sidebar').classList.remove('open');
-});
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+function openMobileSidebar() {
+    sidebar?.classList.add('open');
+    sidebarOverlay?.classList.add('open');
+}
+
+function closeMobileSidebar() {
+    sidebar?.classList.remove('open');
+    sidebarOverlay?.classList.remove('open');
+}
+
+document.getElementById('mobile-menu-btn')?.addEventListener('click', openMobileSidebar);
+document.getElementById('close-sidebar-btn')?.addEventListener('click', closeMobileSidebar);
+sidebarOverlay?.addEventListener('click', closeMobileSidebar);
 
 document.querySelectorAll('.password-toggle-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -643,6 +653,7 @@ window.addEventListener('keydown', (e) => {
         leaderboardModal?.classList.add("hidden");
         document.getElementById('logout-modal')?.classList.add('hidden');
         document.getElementById('settings-modal')?.classList.add('hidden');
+        closeMobileSidebar();
         teardownLeaderboardRealtime();
     }
 });

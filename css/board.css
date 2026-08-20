@@ -108,28 +108,25 @@
 }
 
 @media (max-width: 1024px) {
-    /* Tablet - Keep it next to Kanban but scale */
-    .play-area {
-        flex-direction: row;
-    }
-}
-
-@media (max-width: 768px) {
-    /* Mobile - Stack vertically and collapse the chessboard slightly */
-    .play-area {
-        flex-direction: column;
-    }
-    
     .chessboard-panel {
         width: 100%;
-        max-width: 400px;
+        max-width: 360px;
         margin: 0 auto;
     }
     
     .chess-board {
         width: 100%;
-        max-width: 320px;
+        max-width: 280px;
         height: auto;
         aspect-ratio: 1 / 1;
+    }
+
+    .square {
+        font-size: clamp(1rem, 3.5vw, 1.4rem);
+    }
+
+    .piece-icon {
+        width: clamp(16px, 3.5vw, 22px);
+        height: clamp(16px, 3.5vw, 22px);
     }
 }
