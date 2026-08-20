@@ -185,20 +185,29 @@
 
             <!-- Command Center / Input Area -->
             <section class="command-center">
-                <h2>Propose a Move</h2>
+                <div class="section-title">
+                    <i data-lucide="plus-circle"></i>
+                    <h2>Propose a Move</h2>
+                </div>
                 <form id="todo-form" class="move-form">
                     <div class="input-row main-input">
                         <input type="text" id="task-input" placeholder="e.g., Design frontend framework layer..." required autocomplete="off">
-                        <button type="submit" class="btn-primary">Play Move (Add)</button>
+                        <button type="submit" class="btn-primary"><i data-lucide="plus"></i> <span>Play Move</span></button>
                     </div>
                     
                     <div class="input-row secondary-inputs">
-                        <input type="datetime-local" id="task-due-date" title="Due Date">
-                        <input type="text" id="task-notes" placeholder="Additional notes..." autocomplete="off">
+                        <div class="input-field">
+                            <label for="task-due-date"><i data-lucide="calendar"></i> Due Date</label>
+                            <input type="datetime-local" id="task-due-date" title="Due Date">
+                        </div>
+                        <div class="input-field">
+                            <label for="task-notes"><i data-lucide="file-text"></i> Tactical Notes</label>
+                            <input type="text" id="task-notes" placeholder="Additional notes..." autocomplete="off">
+                        </div>
                     </div>
 
                     <div class="piece-selector">
-                        <label>Piece Assignment (Priority)</label>
+                        <label><i data-lucide="shield"></i> Piece Assignment (Priority)</label>
                         <div class="piece-options">
                             <label class="piece-option">
                                 <input type="radio" name="priority" value="pawn" checked>
@@ -225,45 +234,72 @@
             <div class="play-area">
                 <!-- Visual Chessboard -->
                 <div class="chessboard-panel">
-                    <h3>Tactical Visualizer (Active Board)</h3>
+                    <div class="section-title">
+                        <i data-lucide="crosshair"></i>
+                        <h3>Tactical Visualizer</h3>
+                    </div>
                     <div id="chess-board" class="chess-board">
                         <!-- 8x8 squares rendered dynamically -->
                     </div>
                     <div class="board-legend">Pieces on the board represent your active tasks. Click any piece to see its description.</div>
                 </div>
 
-                <!-- Chess-Kanban Board -->
-                <div class="kanban-mobile-hint">
-                    <i data-lucide="chevrons-left-right"></i>
-                    <span>Swipe columns horizontally</span>
-                </div>
-                <div class="kanban-panel">
-                    <div class="kanban-columns">
-                        <!-- Column 1 -->
-                        <div class="kanban-column" data-phase="opening">
-                            <div class="column-header">
-                                <h3>Opening Theory</h3>
-                                <span class="badge" id="badge-opening">0</span>
-                            </div>
-                            <div class="column-tasks" id="tasks-opening"></div>
-                        </div>
+                <!-- Chess-Kanban Board Section -->
+                <div class="kanban-section">
+                    <!-- Mobile Segmented Phase Tabs -->
+                    <div class="kanban-mobile-tabs" id="kanban-mobile-tabs">
+                        <button type="button" class="kanban-tab active" data-phase="opening">
+                            <span class="tab-label">Opening</span>
+                            <span class="tab-badge" id="tab-badge-opening">0</span>
+                        </button>
+                        <button type="button" class="kanban-tab" data-phase="middlegame">
+                            <span class="tab-label">Middlegame</span>
+                            <span class="tab-badge" id="tab-badge-middlegame">0</span>
+                        </button>
+                        <button type="button" class="kanban-tab" data-phase="endgame">
+                            <span class="tab-label">Endgame</span>
+                            <span class="tab-badge" id="tab-badge-endgame">0</span>
+                        </button>
+                    </div>
 
-                        <!-- Column 2 -->
-                        <div class="kanban-column" data-phase="middlegame">
-                            <div class="column-header">
-                                <h3>Middlegame Tactics</h3>
-                                <span class="badge" id="badge-middlegame">0</span>
+                    <!-- Chess-Kanban Board -->
+                    <div class="kanban-panel" id="kanban-panel">
+                        <div class="kanban-columns">
+                            <!-- Column 1 -->
+                            <div class="kanban-column" id="col-opening" data-phase="opening">
+                                <div class="column-header">
+                                    <div class="col-title-group">
+                                        <i data-lucide="flag"></i>
+                                        <h3>Opening Theory</h3>
+                                    </div>
+                                    <span class="badge" id="badge-opening">0</span>
+                                </div>
+                                <div class="column-tasks" id="tasks-opening"></div>
                             </div>
-                            <div class="column-tasks" id="tasks-middlegame"></div>
-                        </div>
 
-                        <!-- Column 3 -->
-                        <div class="kanban-column" data-phase="endgame">
-                            <div class="column-header">
-                                <h3>Endgame Drills</h3>
-                                <span class="badge" id="badge-endgame">0</span>
+                            <!-- Column 2 -->
+                            <div class="kanban-column" id="col-middlegame" data-phase="middlegame">
+                                <div class="column-header">
+                                    <div class="col-title-group">
+                                        <i data-lucide="zap"></i>
+                                        <h3>Middlegame Tactics</h3>
+                                    </div>
+                                    <span class="badge" id="badge-middlegame">0</span>
+                                </div>
+                                <div class="column-tasks" id="tasks-middlegame"></div>
                             </div>
-                            <div class="column-tasks" id="tasks-endgame"></div>
+
+                            <!-- Column 3 -->
+                            <div class="kanban-column" id="col-endgame" data-phase="endgame">
+                                <div class="column-header">
+                                    <div class="col-title-group">
+                                        <i data-lucide="crown"></i>
+                                        <h3>Endgame Drills</h3>
+                                    </div>
+                                    <span class="badge" id="badge-endgame">0</span>
+                                </div>
+                                <div class="column-tasks" id="tasks-endgame"></div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -39,6 +39,8 @@ export function renderTasks(tasks, handlers) {
         
         const phaseTasks = tasks.filter(t => t.phase === phase);
         if (badge) badge.innerText = phaseTasks.length;
+        const tabBadge = document.getElementById(`tab-badge-${phase}`);
+        if (tabBadge) tabBadge.innerText = phaseTasks.length;
         
         if (phaseTasks.length === 0) {
             let msg = 'Plan your next move!';

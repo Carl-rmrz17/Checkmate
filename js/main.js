@@ -272,6 +272,44 @@ document.querySelectorAll('.password-toggle-btn').forEach(btn => {
     });
 });
 
+// Mobile Kanban Tabs Switcher
+const kanbanTabs = document.querySelectorAll('.kanban-tab');
+const kanbanPanel = document.getElementById('kanban-panel');
+
+kanbanTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const phase = tab.getAttribute('data-phase');
+        const targetCol = document.getElementById(`col-${phase}`);
+        if (targetCol && kanbanPanel) {
+            kanbanTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            targetCol.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    });
+});
+
+if (kanbanPanel) {
+    let scrollTimeout;
+    kanbanPanel.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const scrollLeft = kanbanPanel.scrollLeft;
+            const colWidth = kanbanPanel.offsetWidth;
+            const activeIdx = Math.round(scrollLeft / (colWidth || 1));
+            const phases = ['opening', 'middlegame', 'endgame'];
+            const activePhase = phases[Math.min(activeIdx, phases.length - 1)];
+            
+            kanbanTabs.forEach(tab => {
+                if (tab.getAttribute('data-phase') === activePhase) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+        }, 80);
+    }, { passive: true });
+}
+
 // ---------------------------------------------------------
 // Theme Selector
 

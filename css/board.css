@@ -13,12 +13,10 @@
     width: 340px; /* Fixed width on desktop */
 }
 
-.chessboard-panel h3 {
+.chessboard-panel .section-title {
     width: 100%;
+    justify-content: center;
     margin-bottom: var(--space-md);
-    font-size: 0.95rem;
-    color: var(--text-secondary);
-    text-align: center;
 }
 
 .chess-board {
@@ -27,8 +25,8 @@
     grid-template-rows: repeat(8, 1fr);
     width: 300px;
     height: 300px;
-    border: 4px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border: 3px solid var(--border-color);
+    border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
     overflow: hidden;
 }
@@ -48,6 +46,7 @@
     color: var(--text-muted);
     text-align: center;
     line-height: 1.4;
+    max-width: 280px;
 }
 
 /* Base Theme (Obsidian Gold) */
@@ -110,23 +109,24 @@
 @media (max-width: 1024px) {
     .chessboard-panel {
         width: 100%;
-        max-width: 360px;
-        margin: 0 auto;
+        max-width: 100%;
+        margin: 0;
+        box-shadow: var(--shadow-sm);
     }
     
     .chess-board {
         width: 100%;
-        max-width: 280px;
+        max-width: 270px;
         height: auto;
         aspect-ratio: 1 / 1;
     }
 
     .square {
-        font-size: clamp(1rem, 3.5vw, 1.4rem);
+        font-size: clamp(0.9rem, 3.5vw, 1.3rem);
     }
 
     .piece-icon {
-        width: clamp(16px, 3.5vw, 22px);
-        height: clamp(16px, 3.5vw, 22px);
+        width: clamp(14px, 3.5vw, 20px);
+        height: clamp(14px, 3.5vw, 20px);
     }
 }
