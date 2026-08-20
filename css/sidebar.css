@@ -218,8 +218,11 @@
         transform: translateX(-100%);
         box-shadow: var(--shadow-lg);
         overflow-y: auto;
+        overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
         z-index: var(--z-drawer);
+        padding-bottom: var(--space-2xl);
     }
     
     .sidebar.open {
@@ -227,6 +230,22 @@
     }
     
     .close-sidebar-btn {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+
+    .player-card,
+    .sidebar-action-btn,
+    .theme-panel,
+    .stats-panel,
+    .graveyard-container {
+        flex-shrink: 0;
+    }
+
+    .graveyard-container {
+        flex-grow: 0;
+        overflow: visible;
     }
 }
